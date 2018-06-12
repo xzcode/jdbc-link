@@ -1,4 +1,4 @@
-rootProject.name = "${group}-jdbclink"
+rootProject.name = "jdbc-link"
 include ":${rootProject.name}-core"
 include ":${rootProject.name}-autoconfig"
 include ":${rootProject.name}-code-gen"
