@@ -1,7 +1,7 @@
 dependencies {
 	
     
-	compile group: 'org.springframework', name: 'spring-jdbc', version: "2.0.2.RELEASES"
+	compile group: 'org.springframework', name: 'spring-jdbc', version: "2.0.2.RELEASE"
     
 	compile group: 'org.apache.commons', name: 'commons-pool2', version: '2.5.0'
 	
