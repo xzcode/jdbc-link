@@ -1,0 +1,20 @@
+dependencies {
+	
+    
+	compile group: 'org.springframework', name: 'spring-jdbc', version: "2.0.2.RELEASES"
+    
+	compile group: 'org.apache.commons', name: 'commons-pool2', version: '2.5.0'
+	
+	compile group: 'org.springframework', name: 'spring-context', version: "2.0.2.RELEASES"
+	
+	compile group: 'io.github.lukehutch', name: 'fast-classpath-scanner', version: '2.4.2'
+	
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+	
+	compile group: 'org.freemarker', name: 'freemarker', version: '2.3.28'
+	
+	compile project(":${group}-jdbclink-core")
+	
+	
+}
+

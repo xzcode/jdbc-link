@@ -1,0 +1,13 @@
+dependencies {
+	
+    
+	compile group: 'org.springframework', name: 'spring-jdbc', version: '5.0.6.RELEASE'
+    
+	compile group: 'org.apache.commons', name: 'commons-pool2', version: "2.5.0"
+	
+	compile group: 'io.github.lukehutch', name: 'fast-classpath-scanner', version: '2.4.2'
+	
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: "3.7"
+	
+}
+
