@@ -1,6 +1,6 @@
-/*config example*/
-sourcemuch:
-	commons:
-		jdbclink:
-			enabled: true
-		    
+#config example#
+```
+xz:
+	jdbclink:
+		enabled: true
+```		    

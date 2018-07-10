@@ -13,9 +13,11 @@ import com.xzcode.jdbclink.core.JdbcLink;
 import com.xzcode.jdbclink.core.JdbcLinkConfig;
 
 @Configuration
-@ConfigurationProperties(prefix="sourcemuch.commons.jdbclink")
-@ConditionalOnProperty(prefix="sourcemuch.commons.jdbclink", name="enabled", havingValue="true")
+@ConfigurationProperties(prefix=JdbcLinkAutoConfig.PACKAGE_PREFIX)
+@ConditionalOnProperty(prefix=JdbcLinkAutoConfig.PACKAGE_PREFIX, name="enabled", havingValue="true")
 public class JdbcLinkAutoConfig{
+	
+	protected static final String PACKAGE_PREFIX = "xz.jdbclink";
 	
 	private Boolean enabled = false;
 	

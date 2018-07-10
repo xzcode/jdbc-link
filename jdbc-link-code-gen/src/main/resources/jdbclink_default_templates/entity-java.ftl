@@ -1,9 +1,9 @@
 package ${tableEntityInfo.fullPackageName};
 
-import com.sourcemuch.commons.jdbclink.core.annotations.Column;
-import com.sourcemuch.commons.jdbclink.core.annotations.Id;
-import com.sourcemuch.commons.jdbclink.core.annotations.Table;
-import com.sourcemuch.commons.jdbclink.core.annotations.Entity;
+import com.xzcode.jdbclink.core.annotations.Column;
+import com.xzcode.jdbclink.core.annotations.Id;
+import com.xzcode.jdbclink.core.annotations.Table;
+import com.xzcode.jdbclink.core.annotations.Entity;
 <#list tableEntityInfo.importJavaTypes as imp>  
 import ${imp};
 </#list>
