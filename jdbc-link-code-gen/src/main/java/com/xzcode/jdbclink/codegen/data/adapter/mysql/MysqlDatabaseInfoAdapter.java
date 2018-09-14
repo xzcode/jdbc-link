@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.xzcode.jdbclink.codegen.config.JdbcLinkEntityGeneratorConfig;
 import com.xzcode.jdbclink.codegen.custom.clazz.IEntityClassNameGenerator;
@@ -19,7 +20,6 @@ import com.xzcode.jdbclink.codegen.custom.property.IEntityClassPropertyGenerator
 import com.xzcode.jdbclink.codegen.data.adapter.IDatabaseInfoAdapter;
 import com.xzcode.jdbclink.codegen.model.ColumnInfo;
 import com.xzcode.jdbclink.codegen.model.TableEntityInfo;
-import com.xzcode.jdbclink.core.JdbcLink;
 
 /**
  * mysql数据库信息适配
@@ -32,9 +32,10 @@ public class MysqlDatabaseInfoAdapter implements IDatabaseInfoAdapter{
 	
 	private static final Logger looger = LoggerFactory.getLogger(MysqlDatabaseInfoAdapter.class);
 	
-	private JdbcLink jdbcLink;
-	public void setJdbcLink(JdbcLink jdbcLink) {
-		this.jdbcLink = jdbcLink;
+	private JdbcTemplate jdbcTemplate;
+	
+	public void setJdbcLink(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
 	}
 	
 	private JdbcLinkEntityGeneratorConfig entityGeneratorConfig;
@@ -85,12 +86,12 @@ public class MysqlDatabaseInfoAdapter implements IDatabaseInfoAdapter{
 
 
 
-	public MysqlDatabaseInfoAdapter(JdbcLink jdbcLink, JdbcLinkEntityGeneratorConfig entityGeneratorConfig,
+	public MysqlDatabaseInfoAdapter(JdbcTemplate jdbcTemplate, JdbcLinkEntityGeneratorConfig entityGeneratorConfig,
 			IEntityClassPropertyGenerator propertyGenerator, IDataTypeConverter javaTypeConverter,
 			IColumnCommentParser columnCommentParser, IEntityClassNameGenerator classNameGenerator,
 			IModuleNameGenerator moduleNameGenerator) {
 		super();
-		this.jdbcLink = jdbcLink;
+		this.jdbcTemplate = jdbcTemplate;
 		this.entityGeneratorConfig = entityGeneratorConfig;
 		this.propertyGenerator = propertyGenerator;
 		this.javaTypeConverter = javaTypeConverter;
@@ -118,7 +119,7 @@ public class MysqlDatabaseInfoAdapter implements IDatabaseInfoAdapter{
 	public List<String> getDatabases() {
 		String sql = "SHOW DATABASES";
 		
-		List<Map<String, Object>> list = this.jdbcLink.select(sql);
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
 		
 		List<String> databases = list.stream().map(map -> {
 			return (String)map.get("Database");
@@ -129,9 +130,9 @@ public class MysqlDatabaseInfoAdapter implements IDatabaseInfoAdapter{
 
 	@Override
 	public List<TableEntityInfo> getTableInfos(String databaseName) {
-		String sql = "SHOW TABLE STATUS FROM " + databaseName;
+		String sql = "SHOW TABLE STATUS FROM `" + databaseName +"`";
 		
-		List<Map<String, Object>> list = this.jdbcLink.select(sql);
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
 		
 		List<TableEntityInfo> tableEntityInfos = list.stream().map(map -> {
 			
@@ -141,10 +142,13 @@ public class MysqlDatabaseInfoAdapter implements IDatabaseInfoAdapter{
 			tableEntityInfo.setColumns(getColumnsInfo(databaseName, tableEntityInfo.getTableName()));
 			tableEntityInfo.setDatabaseName(databaseName);
 			tableEntityInfo.setEntityClassName(classNameGenerator.generateClassName(tableEntityInfo.getTableName()));
-			
-			String moduleName = moduleNameGenerator.generateModulePackageName(tableEntityInfo.getTableName(), null, null);
-			tableEntityInfo.setFullPackageName(entityGeneratorConfig.getEntityBasicPackage() + "." + moduleName);
-			tableEntityInfo.setModuleName(moduleName);
+			if (entityGeneratorConfig.isCreateModulePackage()) {
+				String moduleName = moduleNameGenerator.generateModulePackageName(tableEntityInfo.getTableName(), null, null);
+				tableEntityInfo.setFullPackageName(entityGeneratorConfig.getEntityBasicPackage() + "." + moduleName);
+				tableEntityInfo.setModuleName(moduleName);
+			}else {
+				tableEntityInfo.setFullPackageName(entityGeneratorConfig.getEntityBasicPackage());
+			}
 			
 			tableEntityInfo.setFullPackageClassName(tableEntityInfo.getFullPackageName() + "." + tableEntityInfo.getEntityClassName());
 			
@@ -171,9 +175,9 @@ public class MysqlDatabaseInfoAdapter implements IDatabaseInfoAdapter{
 			looger.info("Getting column info from {}.{} .", databaseName, tableName);
 		}
 		
-		String sql = "SHOW FULL COLUMNS FROM " + databaseName + "." + tableName;
+		String sql = "SHOW FULL COLUMNS FROM `" + databaseName + "`.`" + tableName +"`";
 		
-		List<Map<String, Object>> list = this.jdbcLink.select(sql);
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
 		
 		List<ColumnInfo> columnInfos = list.stream().map(map -> {
 			
@@ -212,9 +216,9 @@ public class MysqlDatabaseInfoAdapter implements IDatabaseInfoAdapter{
 
 	@Override
 	public String getCreateTable(String databaseName, String tableName) {
-		String sql = "SHOW CREATE TABLE " + databaseName + "." + tableName;
+		String sql = "SHOW CREATE TABLE `" + databaseName + "." + tableName +"`";
 		
-		List<Map<String, Object>> list = this.jdbcLink.select(sql);
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
 		
 		List<String> createTableSqls = (List<String>) list.stream().map(map -> {
 			

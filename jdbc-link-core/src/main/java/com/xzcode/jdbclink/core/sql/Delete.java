@@ -2,21 +2,21 @@ package com.xzcode.jdbclink.core.sql;
 
 import java.util.Map;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import com.xzcode.jdbclink.core.EntityInfo;
-import com.xzcode.jdbclink.core.cache.IEntityInfoCache;
+import com.xzcode.jdbclink.core.JdbcLinkConfig;
+import com.xzcode.jdbclink.core.entity.EntityInfo;
+import com.xzcode.jdbclink.core.entity.model.EntityField;
 import com.xzcode.jdbclink.core.models.SqlAndParams;
-import com.xzcode.jdbclink.core.pool.string.StringBuilderPool;
+import com.xzcode.jdbclink.core.resolver.ISqlResolver;
 import com.xzcode.jdbclink.core.sql.interfaces.ExecuteAble;
 import com.xzcode.jdbclink.core.sql.interfaces.WhereAble;
 import com.xzcode.jdbclink.core.sql.join.Join;
 import com.xzcode.jdbclink.core.sql.limit.LimitParam;
 import com.xzcode.jdbclink.core.sql.where.Where;
 import com.xzcode.jdbclink.core.util.ShowSqlUtil;
-import com.xzcode.jdbclink.core.util.SqlUtil;
 
-public class Delete extends AbstractCommon implements WhereAble<Delete, Delete>,ExecuteAble{
+public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
+	
+	protected JdbcLinkConfig config;
 	
 	protected EntityInfo entityInfo;
 	
@@ -24,41 +24,54 @@ public class Delete extends AbstractCommon implements WhereAble<Delete, Delete>,
 	
 	protected Map<String, Join<Delete, Delete>> joins;
 	
+	protected ISqlResolver sqlResolver;
+	
 	protected LimitParam limit;
 	
-	public Delete(Class<?> clazz, JdbcTemplate jdbcTemplate, StringBuilderPool stringBuilderPool, IEntityInfoCache entityInfoCache) {
-		this.stringBuilderPool = stringBuilderPool;
-		this.jdbcTemplate = jdbcTemplate;
-		this.entityInfoCache = entityInfoCache;
-		this.entityInfo = entityInfoCache.getEntityInfo(clazz);
+	public Delete(Class<?> clazz, JdbcLinkConfig config) {
+		this.config = config;
+		this.entityInfo = config.getEntityInfoCache().getEntityInfo(clazz);
 		
 	}
 	
-	public int deleteById(Object uid, Class<?> t) {
-		EntityInfo entityInfo = entityInfoCache.getEntityInfo(t);
-		StringBuilder sb = stringBuilderPool.get();
+	public int byId(Object uid) {
+		StringBuilder sb = config.getStringBuilderPool().get();
 		sb
 		.append(" delete from ")
 		.append(entityInfo.getTable())
 		.append(" where ")
-		.append(entityInfo.getId())
+		.append(entityInfo.getPrimaryKeyFieldInfo().getColumn())
+		.append(" = ? ");
+		;
+		String sql = sb.toString();
+		config.getStringBuilderPool().returnOject(sb);
+		ShowSqlUtil.debugSqlAndParams(sql, uid);
+		return this.config.getJdbcTemplate().update(sql, uid);
+	}
+	
+	public int byField(EntityField field, Object value) {
+		StringBuilder sb = config.getStringBuilderPool().get();
+		sb
+		.append(" delete from ")
+		.append(entityInfo.getTable())
+		.append(" where ")
+		.append(field.getFieldName())
 		.append(" = ? ");
 		
 		;
 		String sql = sb.toString();
-		ShowSqlUtil.debugSqlAndParams(sql, uid);
-		int result = this.jdbcTemplate.update(sql, uid);
-		stringBuilderPool.returnOject(sb);
-		return result;
+		config.getStringBuilderPool().returnOject(sb);
+		ShowSqlUtil.debugSqlAndParams(sql, value);
+		return this.config.getJdbcTemplate().update(sql, value);
 	}
 	
 	
 	
 	@Override
 	public int execute() {
-		SqlAndParams sqlAndParams = SqlUtil.handelDelete(this, stringBuilderPool);
+		SqlAndParams sqlAndParams = sqlResolver.handelDelete(this);
 		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		return this.jdbcTemplate.update(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray());
+		return this.config.getJdbcTemplate().update(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray());
 	}
 	
 	
@@ -71,51 +84,6 @@ public class Delete extends AbstractCommon implements WhereAble<Delete, Delete>,
 		return where;
 	}
 	
-	/*public DeleteJoin join(Class<?> clazz, String alias) {
-		
-		DeleteJoin join = new DeleteJoin(this, alias);
-		this.addJoins(alias, join);
-		join.setJoinTag( "inner join");
-		return join;
-	}
-	
-	public DeleteJoin join(Class<?> clazz, String alias, String prefix) {
-		
-		DeleteJoin join = new DeleteJoin(this, alias, prefix);
-		join.setJoinTag( "inner join");
-		this.addJoins(alias, join);
-		return join;
-	}
-	
-	public DeleteJoin leftJoin(Class<?> clazz, String alias) {
-		
-		DeleteJoin join = new DeleteJoin(this, alias);
-		join.setJoinTag( "left join");
-		this.addJoins(alias, join);
-		return join;
-	}
-	
-	public DeleteJoin leftJoin(Class<?> clazz, String alias, String prefix) {
-		
-		DeleteJoin join = new DeleteJoin(this, alias, prefix);
-		join.setJoinTag( "left join");
-		this.addJoins(alias, join);
-		return join;
-	}
-	
-	public DeleteJoin rightJoin(Class<?> clazz, String alias) {
-		DeleteJoin join = new DeleteJoin(this, alias);
-		join.setJoinTag( "right join");
-		this.addJoins(alias, join);
-		return join;
-	}
-	
-	public DeleteJoin rightJoin(Class<?> clazz, String alias, String prefix) {
-		DeleteJoin join = new DeleteJoin(this, alias, prefix, "right join");
-		this.addJoins(alias, join);
-		return join;
-	}*/
-	
 	
 	@Override
 	public ExecuteAble getExecuteAble() {
@@ -126,6 +94,14 @@ public class Delete extends AbstractCommon implements WhereAble<Delete, Delete>,
 	
 	public EntityInfo getEntityInfo() {
 		return entityInfo;
+	}
+	
+	public ISqlResolver getSqlResolver() {
+		return sqlResolver;
+	}
+	
+	public void setSqlResolver(ISqlResolver sqlResolver) {
+		this.sqlResolver = sqlResolver;
 	}
 	
 	@Override

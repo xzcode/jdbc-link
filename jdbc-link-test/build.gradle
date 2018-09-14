@@ -1,13 +1,30 @@
+buildscript {
+		repositories {
+			maven {url "${nexusPublicUrl}"}
+			mavenLocal()
+		}
+		dependencies {
+			classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		}
+	}
+	
+	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'org.springframework.boot'
+
 dependencies {
+
+	compile("org.springframework.boot:spring-boot-starter-web")
+	
+	compile("org.springframework.boot:spring-boot-starter-test")
 	
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: "3.7"
-	
-	compile group: 'commons-dbutils', name: 'commons-dbutils', version: '1.7'
 	
 	
 	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.46'
 	
-	compile project(":${rootProject.name}-base")
+	compile project(":${rootProject.name}-autoconfig")
+	
+	compile project(":${rootProject.name}-code-gen")
 	
 	testCompile group: 'junit', name: 'junit', version: '4.12'
 	

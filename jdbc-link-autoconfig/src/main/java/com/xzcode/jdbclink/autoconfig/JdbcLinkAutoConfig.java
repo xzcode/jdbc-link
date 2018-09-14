@@ -31,7 +31,7 @@ public class JdbcLinkAutoConfig{
 	//@ConditionalOnBean(JdbcTemplate.class)
 	public JdbcLink jdbcLink() {
 		Assert.notNull(jdbcTemplate, " Can't autowrite spring jdbcTemplate! ");
-		Assert.notNull(scanPackage, " Jdbclink: property 'scanPackage' can not be null! ");
+		Assert.notNull(scanPackage, " Jdbclink: property 'scanPackage' can not be empty! ");
 		
 		JdbcLinkConfig config = new JdbcLinkConfig(jdbcTemplate, scanPackage);
 		JdbcLink jdbcLink = new JdbcLink(config);

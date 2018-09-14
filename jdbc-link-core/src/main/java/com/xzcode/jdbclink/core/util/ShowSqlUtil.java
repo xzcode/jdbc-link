@@ -29,6 +29,12 @@ public class ShowSqlUtil {
 		}
 	}
 	
+	public static void debugSqlAndParams(String sql, String params) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("\nSQL query:{}\nSQL param:{}", sql, params);
+		}
+	}
+	
 	public static void debugSqlAndParams(String sql, List<Object> args) {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("\nSQL query:{}\nSQL param:{}", sql, args);

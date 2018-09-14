@@ -4,6 +4,8 @@ import com.xzcode.jdbclink.core.sql.limit.LimitParam;
 
 public interface LimitAble<T> extends LimitSizeAble<T>{
 	
+	LimitParam DIFAULT_LIMIT_PARAM = new LimitParam(0, 1, 10);
+	
 	
 	public default T limitStarts(Integer starts, Integer size) {
 		return setLimitParam(new LimitParam(starts, size));
@@ -21,7 +23,7 @@ public interface LimitAble<T> extends LimitSizeAble<T>{
 	
 	
 	public default T limit() {
-		return setLimitParam(new LimitParam(0, 1, 10));
+		return setLimitParam(DIFAULT_LIMIT_PARAM);
 	}
 	
 	/*public default T limitStarts(Integer starts, Integer size) {

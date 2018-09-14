@@ -6,6 +6,8 @@ import com.xzcode.jdbclink.core.annotations.Entity;
 import com.xzcode.jdbclink.core.cache.DefaultEntityInfoCache;
 import com.xzcode.jdbclink.core.cache.IEntityInfoCache;
 import com.xzcode.jdbclink.core.pool.string.StringBuilderPool;
+import com.xzcode.jdbclink.core.resolver.ISqlResolver;
+import com.xzcode.jdbclink.core.resolver.SqlResolver;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 
@@ -23,6 +25,8 @@ public class JdbcLinkConfig{
 	
 	//实体信息缓存装配
 	private IEntityInfoCache entityInfoCache = new DefaultEntityInfoCache();
+	
+	private ISqlResolver sqlResolver;
 	
 	
 	
@@ -49,6 +53,8 @@ public class JdbcLinkConfig{
 	 * 2018-04-21
 	 */
 	public void init() {
+		
+		 sqlResolver = new SqlResolver(this);
 		
 		//扫描实体类
 		if (entityPackages != null && entityPackages.length > 0) {
@@ -96,6 +102,14 @@ public class JdbcLinkConfig{
 		this.entityInfoCache = entityInfoCache;
 	}
 	
+	
+	public ISqlResolver getSqlResolver() {
+		return sqlResolver;
+	}
+	
+	public void setSqlResolver(ISqlResolver sqlResolver) {
+		this.sqlResolver = sqlResolver;
+	}
 	
 
 

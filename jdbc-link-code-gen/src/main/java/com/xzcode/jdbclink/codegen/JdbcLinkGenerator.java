@@ -3,17 +3,13 @@ package com.xzcode.jdbclink.codegen;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.RuntimeErrorException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.xzcode.jdbclink.codegen.config.JdbcLinkEntityGeneratorConfig;
 import com.xzcode.jdbclink.codegen.config.JdbcLinkExtraGeneratorConfig;
@@ -31,10 +27,7 @@ import com.xzcode.jdbclink.codegen.data.adapter.IDatabaseInfoAdapter;
 import com.xzcode.jdbclink.codegen.data.adapter.mysql.MysqlDatabaseInfoAdapter;
 import com.xzcode.jdbclink.codegen.model.ExtraTemplateInfo;
 import com.xzcode.jdbclink.codegen.model.TableEntityInfo;
-import com.xzcode.jdbclink.core.JdbcLink;
 
-import freemarker.cache.ByteArrayTemplateLoader;
-import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -50,13 +43,12 @@ public class JdbcLinkGenerator {
 	
 	private static final Logger looger = LoggerFactory.getLogger(JdbcLinkGenerator.class);
 	
-	
+	private JdbcTemplate jdbcTemplate;
 	
 	private JdbcLinkEntityGeneratorConfig entityGeneratorConfig;
 	public void setConfig(JdbcLinkEntityGeneratorConfig entityGeneratorConfig) {
 		this.entityGeneratorConfig = entityGeneratorConfig;
 	}
-	private JdbcLink jdbcLink;
 	
 	/**数据库信息数据适配器*/
 	private IDatabaseInfoAdapter databaseInfoAdapter;
@@ -98,10 +90,10 @@ public class JdbcLinkGenerator {
 	
 	
 	
-	public JdbcLinkGenerator(JdbcLinkEntityGeneratorConfig config, JdbcLink jdbcLink) {
+	public JdbcLinkGenerator(JdbcLinkEntityGeneratorConfig config, JdbcTemplate jdbcTemplate) {
 		super();
 		this.entityGeneratorConfig = config;
-		this.jdbcLink = jdbcLink;
+		this.jdbcTemplate = jdbcTemplate;
 		
 		this.databaseInfoAdapter = getDatabaseInfoAdapter();
 	}
@@ -157,7 +149,7 @@ public class JdbcLinkGenerator {
 		
 		switch (databaseType) {
 		case "mysql":
-			MysqlDatabaseInfoAdapter mysqlDatabaseInfoAdapter = new MysqlDatabaseInfoAdapter(jdbcLink, entityGeneratorConfig, propertyGenerator, javaTypeConverter, columnCommentParser, classNameGenerator, moduleNameGenerator);
+			MysqlDatabaseInfoAdapter mysqlDatabaseInfoAdapter = new MysqlDatabaseInfoAdapter(jdbcTemplate, entityGeneratorConfig, propertyGenerator, javaTypeConverter, columnCommentParser, classNameGenerator, moduleNameGenerator);
 			
 			return mysqlDatabaseInfoAdapter;
 
@@ -184,8 +176,11 @@ public class JdbcLinkGenerator {
 			
 			for (TableEntityInfo tableEntityInfo : tableEntityInfos) {
 				String modulePackageName = moduleNameGenerator.generateModulePackageName(tableEntityInfo.getTableName(), null, null);
-				
-				String entityBasicOutputPath = entityGeneratorConfig.getEntityBasicOutputPath() + "/" + modulePackageName;
+				String packagePath = entityGeneratorConfig.getEntityBasicPackage().replaceAll("\\.", "/");
+				String entityBasicOutputPath = entityGeneratorConfig.getEntityBasicOutputPath() + "/" + packagePath;
+				if (entityGeneratorConfig.isCreateModulePackage()) {
+					entityBasicOutputPath += "/" + modulePackageName;
+				}
 				File outDir = new File(entityBasicOutputPath);
 				if (!outDir.exists()) {
 					outDir.mkdirs();

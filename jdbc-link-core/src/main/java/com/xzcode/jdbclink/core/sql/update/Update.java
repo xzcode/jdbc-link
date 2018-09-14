@@ -1,50 +1,48 @@
 package com.xzcode.jdbclink.core.sql.update;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCallback;
+
 import org.springframework.jdbc.core.PreparedStatementCreator;
 
-import com.xzcode.jdbclink.core.EntityInfo;
-import com.xzcode.jdbclink.core.cache.IEntityInfoCache;
+import com.xzcode.jdbclink.core.JdbcLinkConfig;
+import com.xzcode.jdbclink.core.entity.EntityFieldInfo;
+import com.xzcode.jdbclink.core.entity.EntityInfo;
+import com.xzcode.jdbclink.core.entity.IEntity;
+import com.xzcode.jdbclink.core.entity.model.EntityField;
 import com.xzcode.jdbclink.core.models.SqlAndParams;
-import com.xzcode.jdbclink.core.pool.string.StringBuilderPool;
-import com.xzcode.jdbclink.core.sql.AbstractCommon;
+import com.xzcode.jdbclink.core.resolver.ISqlResolver;
 import com.xzcode.jdbclink.core.sql.interfaces.ExecuteAble;
 import com.xzcode.jdbclink.core.util.ShowSqlUtil;
-import com.xzcode.jdbclink.core.util.SqlUtil;
 
-public class Update extends AbstractCommon implements ExecuteAble{
+public class Update implements ExecuteAble{
+	
+	protected JdbcLinkConfig config;
 	
 	protected EntityInfo entityInfo;
 	
 	protected UpdateSet set;
 	
+	protected ISqlResolver sqlResolver;
+	
 	/*protected LimitParam limit;*/
 	
-	private static final Class<?>[] NULL_CLASS_ARRAY = new Class<?>[]{};
+	//private static final Class<?>[] NULL_CLASS_ARRAY = new Class<?>[]{};
 	
-	private static final Object[] NULL_OBJECT_ARRAY = new Object[]{};
+	//private static final Object[] NULL_OBJECT_ARRAY = new Object[]{};
 	
 	public Update() {
 	}
 	
-	public Update(Class<?> clazz, JdbcTemplate jdbcTemplate, StringBuilderPool stringBuilderPool, IEntityInfoCache entityInfoCache) {
-		this.stringBuilderPool = stringBuilderPool;
-		this.jdbcTemplate = jdbcTemplate;
-		this.entityInfoCache = entityInfoCache;
-		this.entityInfo = entityInfoCache.getEntityInfo(clazz);
+	public Update(Class<?> clazz, JdbcLinkConfig config) {
+		this.config = config;
+		this.entityInfo = config.getEntityInfoCache().getEntityInfo(clazz);
+		this.sqlResolver = config.getSqlResolver();
 	}
 	
 	
@@ -53,41 +51,46 @@ public class Update extends AbstractCommon implements ExecuteAble{
 	}
 	
 	
-	public int update(Object record){
-		return updateNullable(record);
+	public int update(IEntity entity){
+		return updateNullable(entity);
 	}
 	
-	public int updateNullable(Object record, String...nullableColumns){
+	public int updateNullable(IEntity entity, EntityField...nullableFields){
 		int result = 0;
 		
 		try {
-			EntityInfo entityInfo = entityInfoCache.getEntityInfo(record.getClass());
-			StringBuilder sql = stringBuilderPool.get();
-			Class<?> clazz = record.getClass();
+			EntityInfo entityInfo = config.getEntityInfoCache().getEntityInfo(entity.getClass());
+			StringBuilder sql = config.getStringBuilderPool().get();
+			//Class<?> clazz = entity.getClass();
 			
-			List<Object> args = new ArrayList<>(entityInfo.getColumns().size());
+			List<EntityFieldInfo> fieldInfos = entityInfo.getFieldInfos();
+			List<Object> args = new ArrayList<>(fieldInfos.size());
+			
+			int fieldInfosSize = fieldInfos.size();
+			
 			sql.append(" update ").append(entityInfo.getTable());
 			sql.append(" set ");
 			Object uid = null;
-			for (int i = 0; i < entityInfo.getColumns().size(); i++) {
-				Field field = clazz.getDeclaredField(entityInfo.getProps().get(i));
+			for (int i = 0; i < fieldInfosSize; i++) {
+				
+				Field field = fieldInfos.get(i).getField();
 				//Method setMethod = clazz.getMethod("set" + StringUtils.capitalize(field.getName()), field.getType());
-				Method getMethod = clazz.getMethod("get" + StringUtils.capitalize(field.getName()), NULL_CLASS_ARRAY);
-				Object getObj = getMethod.invoke(record, NULL_OBJECT_ARRAY);
+				//Method getMethod = clazz.getMethod("get" + StringUtils.capitalize(field.getName()), NULL_CLASS_ARRAY);
+				Object getObj = field.get(entity);
 				if (getObj != null) {
 					
-					if (entityInfo.getId().equalsIgnoreCase(field.getName())) {
+					if (entityInfo.getPrimaryKeyFieldInfo().getColumn().equalsIgnoreCase(field.getName())) {
 						uid = getObj;
 					}else{
 						args.add(getObj);
-						sql.append(entityInfo.getColumns().get(i)).append("=?,");
+						sql.append(fieldInfos.get(i).getColumn()).append("=?,");
 					}
 				}else {
-					if (nullableColumns != null && nullableColumns.length > 0) {
-						for (String nullCol : nullableColumns) {
-							if (entityInfo.getColumns().get(i).equals(nullCol)) {
+					if (nullableFields != null && nullableFields.length > 0) {
+						for (EntityField nullCol : nullableFields) {
+							if (fieldInfos.get(i).getColumn().equals(nullCol.getFieldName())) {
 								args.add(null);
-								sql.append(entityInfo.getColumns().get(i)).append("=?,");
+								sql.append(fieldInfos.get(i).getColumn()).append("=?,");
 							}
 						}
 					}
@@ -97,13 +100,13 @@ public class Update extends AbstractCommon implements ExecuteAble{
 			sql.setLength(sql.length() - 1);
 			
 			sql.append(" where ")
-			.append(entityInfo.getId())
+			.append(entityInfo.getPrimaryKeyFieldInfo().getColumn())
 			.append(" = ? ");
 			args.add(uid);
 			
 			String sqlStr = sql.toString();
 			
-			stringBuilderPool.returnOject(sql);
+			config.getStringBuilderPool().returnOject(sql);
 			
 			ShowSqlUtil.debugSqlAndParams(sqlStr, args);
 			
@@ -130,7 +133,7 @@ public class Update extends AbstractCommon implements ExecuteAble{
 				
 			};*/
 			
-			result = this.jdbcTemplate.update(statement);
+			result = this.config.getJdbcTemplate().update(statement);
 			
 			
 		} catch (Exception e) {
@@ -141,9 +144,9 @@ public class Update extends AbstractCommon implements ExecuteAble{
 	
 	@Override
 	public int execute() {
-		SqlAndParams sqlAndParams = SqlUtil.handelUpdate(this, stringBuilderPool);
+		SqlAndParams sqlAndParams = sqlResolver.handelUpdate(this);
 		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		return this.jdbcTemplate.update(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray());
+		return this.config.getJdbcTemplate().update(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray());
 	}
 	
 	//------------------------
@@ -158,6 +161,14 @@ public class Update extends AbstractCommon implements ExecuteAble{
 	
 	public UpdateSet getSet() {
 		return set;
+	}
+	
+	public ISqlResolver getSqlResolver() {
+		return sqlResolver;
+	}
+	
+	public void setSqlResolver(ISqlResolver sqlResolver) {
+		this.sqlResolver = sqlResolver;
 	}
 
 	@Override

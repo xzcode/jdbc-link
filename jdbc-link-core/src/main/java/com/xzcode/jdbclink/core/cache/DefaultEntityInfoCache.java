@@ -2,16 +2,24 @@ package com.xzcode.jdbclink.core.cache;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.util.Assert;
-
-import com.xzcode.jdbclink.core.EntityInfo;
 import com.xzcode.jdbclink.core.annotations.Column;
 import com.xzcode.jdbclink.core.annotations.Id;
 import com.xzcode.jdbclink.core.annotations.Table;
+import com.xzcode.jdbclink.core.entity.EntityFieldInfo;
+import com.xzcode.jdbclink.core.entity.EntityInfo;
+import com.xzcode.jdbclink.core.exception.JdbcLinkRuntimeException;
 
+/**
+ * 实体信息缓存
+ * 
+ * 
+ * @author zai
+ * 2018-09-08 16:04:20
+ */
 public class DefaultEntityInfoCache implements IEntityInfoCache{
 	
 	private static final Map<Class<?>, EntityInfo> CACHE_MAP = new ConcurrentHashMap<>();
@@ -36,41 +44,46 @@ public class DefaultEntityInfoCache implements IEntityInfoCache{
 	public EntityInfo createEntityInfo(Class<?> clazz) {
 		
 		EntityInfo entityInfo = new EntityInfo();
-		entityInfo.setProps(new ArrayList<>());
-		entityInfo.setColumns(new ArrayList<>());
+		entityInfo.setFieldInfos(new ArrayList<>());
 		
 		entityInfo.setClazz(clazz);
 		
 		Table table = clazz.getAnnotation(Table.class);
-		Assert.notNull(table, "The table annotation must not be null");
-		
+		if (table == null) {
+			throw new JdbcLinkRuntimeException("The table annotation must not be null");
+		}
+		if (table.name() == null) {
+			throw new JdbcLinkRuntimeException("The table name must not be null");
+		}
 		entityInfo.setTable(table.name());
 		
-		Assert.notNull(table.name(), "The table name must not be null");
+		entityInfo.setAlias(table.name());
 		
+		List<EntityFieldInfo> fieldInfos = entityInfo.getFieldInfos();
+		EntityFieldInfo fieldInfo = null;
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field fd : fields) {
 			Column column = fd.getAnnotation(Column.class);
 			if (column != null) {
-				
-				entityInfo.getColumns().add(column.name());
-				entityInfo.getProps().add(fd.getName());
+				fd.setAccessible(true);
+				fieldInfo = new EntityFieldInfo();
+				fieldInfo.setColumn(column.name());
+				fieldInfo.setPropName(fd.getName());
+				fieldInfo.setField(fd);
+				fieldInfo.setLength(column.length());
+				fieldInfo.setNullable(column.nullable());
 				
 				Id id = fd.getAnnotation(Id.class);
 				if(id != null){
-					entityInfo.setId(column.name());
-					entityInfo.setIdClass(fd.getDeclaringClass());
+					entityInfo.setPrimaryKeyFieldInfo(fieldInfo);
 				}
+				fieldInfos.add(fieldInfo);
 			}
 		}
 		return entityInfo;
 	}
 
 
-	@Override
-	public String getIdColumnName() {
-		return "uid";
-	}
 	
 
 }

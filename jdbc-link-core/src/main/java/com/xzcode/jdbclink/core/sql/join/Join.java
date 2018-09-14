@@ -3,8 +3,8 @@ package com.xzcode.jdbclink.core.sql.join;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.xzcode.jdbclink.core.EntityInfo;
-import com.xzcode.jdbclink.core.cache.IEntityInfoCache;
+import com.xzcode.jdbclink.core.JdbcLinkConfig;
+import com.xzcode.jdbclink.core.entity.EntityInfo;
 import com.xzcode.jdbclink.core.sql.Select;
 import com.xzcode.jdbclink.core.sql.groupby.GroupByParam;
 import com.xzcode.jdbclink.core.sql.interfaces.AliasAndPrefix;
@@ -13,12 +13,16 @@ import com.xzcode.jdbclink.core.sql.interfaces.GroupByAble;
 import com.xzcode.jdbclink.core.sql.interfaces.JoinAble;
 import com.xzcode.jdbclink.core.sql.interfaces.OrderAble;
 import com.xzcode.jdbclink.core.sql.interfaces.ParamAble;
+import com.xzcode.jdbclink.core.sql.interfaces.QueryAble;
 import com.xzcode.jdbclink.core.sql.interfaces.Satisfy;
 import com.xzcode.jdbclink.core.sql.interfaces.WhereAble;
 import com.xzcode.jdbclink.core.sql.param.Param;
 import com.xzcode.jdbclink.core.sql.param.ParamGroup;
 
-public class Join<T, C> implements GroupByAble<Select<C>>,OrderAble<C>,WhereAble<T, C>,JoinAble<T, C>,AliasAndPrefix, ParamAble<Join<T, C>>, GroupAble<Join<T, C>>{
+
+public class Join<T, C> implements QueryAble<C>,GroupByAble<Select<C>>,OrderAble<C>,WhereAble<T, C>,JoinAble<T, C>,AliasAndPrefix, ParamAble<Join<T, C>>, GroupAble<Join<T, C>>{
+	
+	protected JdbcLinkConfig config;
 	
 	protected List<Param<Join<T, C>>> params;
 	
@@ -30,39 +34,38 @@ public class Join<T, C> implements GroupByAble<Select<C>>,OrderAble<C>,WhereAble
 	
 	protected String prefix = "";
 	
-	protected IEntityInfoCache entityInfoCache;
-	
 	protected EntityInfo entityInfo;
 	
 	protected JoinAble<T, C> joinAble;
 	
 	
-	public Join(EntityInfo entityInfo, JoinAble<T, C> joinAble) {
+	public Join(JdbcLinkConfig config, EntityInfo entityInfo, JoinAble<T, C> joinAble) {
+		this.config = config;
 		this.joinAble = joinAble;
 		this.entityInfo = entityInfo;
 	}
 	
-	public Join(EntityInfo entityInfo, JoinAble<T, C> joinAble, String alias) {
+	public Join(JdbcLinkConfig config, EntityInfo entityInfo, JoinAble<T, C> joinAble, String alias) {
+		this.config = config;
 		this.joinAble = joinAble;
-		this.alias = alias;
 		this.entityInfo = entityInfo;
 	}
 	
-	public Join(EntityInfo entityInfo, JoinAble<T, C> joinAble, String alias, String prefix) {
+	public Join(JdbcLinkConfig config, EntityInfo entityInfo, JoinAble<T, C> joinAble, String alias, String prefix) {
+		this.config = config;
 		this.joinAble = joinAble;
 		this.alias = alias;
 		this.prefix = prefix;
 		this.entityInfo = entityInfo;
 	}
 	
-	public Join(EntityInfo entityInfo, JoinAble<T, C> joinAble, String alias, String prefix, String joinTag) {
+	public Join(JdbcLinkConfig config, EntityInfo entityInfo, JoinAble<T, C> joinAble, String alias, String prefix, String joinTag) {
+		this.config = config;
 		this.joinAble = joinAble;
 		this.alias = alias;
 		this.joinTag = joinTag;
 		this.entityInfo = entityInfo;
 	}
-	
-	
 
 	
 	public Param<Join<T, C>> param() {
@@ -183,14 +186,6 @@ public class Join<T, C> implements GroupByAble<Select<C>>,OrderAble<C>,WhereAble
 		return (Select<C>) joinAble2;
 	}
 
-	@Override
-	public IEntityInfoCache getEntityInfoCache() {
-		return this.entityInfoCache;
-	}
-	
-	public void setEntityInfoCache(IEntityInfoCache entityInfoCache) {
-		this.entityInfoCache = entityInfoCache;
-	}
 	
 	@Override
 	public Select<C> addGroupByParams(GroupByParam groupByParam) {
@@ -200,6 +195,15 @@ public class Join<T, C> implements GroupByAble<Select<C>>,OrderAble<C>,WhereAble
 	
 	public JoinAble<T, C> getJoinAble() {
 		return joinAble;
+	}
+
+	@Override
+	public JdbcLinkConfig getConfig() {
+		return config;
+	}
+	
+	public void setConfig(JdbcLinkConfig config) {
+		this.config = config;
 	}
 	
 }

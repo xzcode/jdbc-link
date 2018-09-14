@@ -8,33 +8,30 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.StatementCallback;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 
-import com.xzcode.jdbclink.core.EntityInfo;
-import com.xzcode.jdbclink.core.cache.IEntityInfoCache;
-import com.xzcode.jdbclink.core.pool.string.StringBuilderPool;
+import com.xzcode.jdbclink.core.JdbcLinkConfig;
+import com.xzcode.jdbclink.core.entity.EntityFieldInfo;
+import com.xzcode.jdbclink.core.entity.EntityInfo;
+import com.xzcode.jdbclink.core.entity.IEntity;
 import com.xzcode.jdbclink.core.util.ShowSqlUtil;
 
-public class Insert extends AbstractCommon{
+public class Insert{
 	
 	protected EntityInfo entityInfo;
+	
+	protected JdbcLinkConfig config;
 
 	
-	public Insert(Class<?> clazz, JdbcTemplate jdbcTemplate, StringBuilderPool stringBuilderPool, IEntityInfoCache entityInfoCache) {
-		this.stringBuilderPool = stringBuilderPool;
-		this.jdbcTemplate = jdbcTemplate;
-		this.entityInfoCache = entityInfoCache;
-		this.entityInfo = entityInfoCache.getEntityInfo(clazz);
+	public Insert(Class<?> clazz, JdbcLinkConfig config) {
+		this.config = config;
+		this.entityInfo = config.getEntityInfoCache().getEntityInfo(clazz);
 	}
 	
 	/**
 	 * 插入数据
-	 * @param record 实体对象
+	 * @param entity 实体对象
 	 * @param injectAutoIncrementId 是否注入自增序列id
 	 * @return
 	 * @throws Exception
@@ -42,26 +39,28 @@ public class Insert extends AbstractCommon{
 	 * @author zai
 	 * 2017-06-12
 	 */
-	public int insert(Object record, boolean injectAutoIncrementId) {
+	public int insert(IEntity entity, boolean injectAutoIncrementId) {
 		try {
 
-			this.entityInfo = entityInfoCache.getEntityInfo(record.getClass());
-			StringBuilder sql = stringBuilderPool.get();
-			StringBuilder valuesSql = stringBuilderPool.get();
-			Class<?> clazz = record.getClass();
+			this.entityInfo = config.getEntityInfoCache().getEntityInfo(entity.getClass());
 			
-			List<Object> args = new ArrayList<>(entityInfo.getColumns().size());
+			StringBuilder sql = config.getStringBuilderPool().get();
+			StringBuilder valuesSql = config.getStringBuilderPool().get();
 			
 			sql.append(" insert into ").append(entityInfo.getTable());
 			sql.append(" ( ");
-			for (int i = 0; i < entityInfo.getProps().size(); i++) {
+			List<EntityFieldInfo> fieldInfos = entityInfo.getFieldInfos();
+			List<Object> args = new ArrayList<>(fieldInfos.size());
+			
+			int fieldInfosSize = fieldInfos.size();
+			for (int i = 0; i < fieldInfosSize; i++) {
 				
-				Field field = clazz.getDeclaredField(entityInfo.getProps().get(i));
+				Field field = fieldInfos.get(i).getField();
 				
 				field.setAccessible(true);
-				if (field.get(record) != null) {
-					args.add(field.get(record));
-					sql.append(entityInfo.getColumns().get(i)).append(",");
+				if (field.get(entity) != null) {
+					args.add(field.get(entity));
+					sql.append(fieldInfos.get(i)).append(",");
 					
 					valuesSql.append("?,");
 				}
@@ -77,11 +76,11 @@ public class Insert extends AbstractCommon{
 			.append(valuesSql.toString())
 			.append(" ) ");
 			
-			stringBuilderPool.returnOject(valuesSql);
+			config.getStringBuilderPool().returnOject(valuesSql);
 			
 			String sqlStr = sql.toString();
 			
-			stringBuilderPool.returnOject(sql);
+			config.getStringBuilderPool().returnOject(sql);
 			
 			ShowSqlUtil.debugSqlAndParams(sqlStr, args);
 			
@@ -104,25 +103,27 @@ public class Insert extends AbstractCommon{
 			if (injectAutoIncrementId) {
 				
 				GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-				int result = this.jdbcTemplate.update(statement, keyHolder);
+				int result = this.config.getJdbcTemplate().update(statement, keyHolder);
 				
 				//获取自增序列
 				Long uid = keyHolder.getKey().longValue();
+				
 				//注入uid
-				Field idField = record.getClass().getDeclaredField(entityInfo.getId());
+				Field idField = entityInfo.getPrimaryKeyFieldInfo().getField();
+				
 				if (idField != null) {
 					idField.setAccessible(true);
 					if (idField.getType() == Integer.class) {
-						idField.set(record, uid.intValue());
+						idField.set(entity, uid.intValue());
 					}else {
-						idField.set(record, uid);						
+						idField.set(entity, uid);						
 					}
 				}
 				
 				return result;
 				
 			}else{
-				return this.jdbcTemplate.update(statement);
+				return this.config.getJdbcTemplate().update(statement);
 			}
 		
 		} catch (Exception e) {

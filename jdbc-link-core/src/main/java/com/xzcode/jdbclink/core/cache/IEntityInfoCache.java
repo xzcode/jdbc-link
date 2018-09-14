@@ -1,6 +1,6 @@
 package com.xzcode.jdbclink.core.cache;
 
-import com.xzcode.jdbclink.core.EntityInfo;
+import com.xzcode.jdbclink.core.entity.EntityInfo;
 
 public interface IEntityInfoCache {
 
@@ -13,9 +13,6 @@ public interface IEntityInfoCache {
 	EntityInfo createEntityInfo(Class<?> clazz);
 
 
-	String getIdColumnName();
-	
-	
 
 
 }

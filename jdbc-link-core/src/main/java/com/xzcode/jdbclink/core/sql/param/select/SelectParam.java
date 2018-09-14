@@ -1,5 +1,6 @@
 package com.xzcode.jdbclink.core.sql.param.select;
 
+import com.xzcode.jdbclink.core.entity.model.EntityField;
 import com.xzcode.jdbclink.core.sql.Select;
 
 /**
@@ -12,7 +13,10 @@ import com.xzcode.jdbclink.core.sql.Select;
 public class SelectParam{
 	
 	
-	protected String column = "";
+	
+	protected EntityField field = null;
+	
+	protected String sqlPart = null;
 	
 	protected String alias = "";
 	
@@ -20,24 +24,37 @@ public class SelectParam{
 	
 	protected Select<?> select;
 	
+	protected int type = 1; //参数类型，1 EntityField， 2 sqlpart
+	
+	/**
+	 * 参数类型常量
+	 * 
+	 * @author zai
+	 * 2018-09-10 17:20:57
+	 */
+	public static interface TypeConstant{
+		
+		int ENTITY_FIELD = 1;
+		
+		int SQL_PART = 2;
+	}
+	
 	public SelectParam() {
 	}
 
-	public SelectParam(String column, String alias, Select<?> select) {
+	public SelectParam(EntityField field, String alias, Select<?> select) {
 		super();
-		this.column = column;
+		this.field = field;
 		this.alias = alias;
 		this.select = select;
 	}
 
-	public String getColumn() {
-		return column;
+	public EntityField getField() {
+		return field;
 	}
 
-	public void setColumn(String column) {
-		if (column != null) {
-			this.column = column;			
-		}
+	public void setField(EntityField field) {
+		this.field = field;			
 	}
 
 	public String getAlias() {
@@ -68,5 +85,20 @@ public class SelectParam{
 		}
 	}
 	
+	public String getSqlPart() {
+		return sqlPart;
+	}
+	
+	public void setSqlPart(String sqlPart) {
+		this.sqlPart = sqlPart;
+	}
+	
+	
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
+		this.type = type;
+	}
 
 }

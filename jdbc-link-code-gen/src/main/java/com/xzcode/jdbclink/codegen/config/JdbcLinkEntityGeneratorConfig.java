@@ -24,6 +24,9 @@ public class JdbcLinkEntityGeneratorConfig{
 	/** 实体类基础输出路径. */
 	private String entityBasicOutputPath;
 	
+	/** 是否自动生成模块名称 **/
+	private boolean createModulePackage = true;
+	
 
 	public String getDbUrl() {
 		return dbUrl;
@@ -72,6 +75,14 @@ public class JdbcLinkEntityGeneratorConfig{
 	
 	public void setEntityDatabaseName(String entityDatabaseName) {
 		this.entityDatabaseName = entityDatabaseName;
+	}
+	
+	public boolean isCreateModulePackage() {
+		return createModulePackage;
+	}
+	
+	public void setCreateModulePackage(boolean createModulePackage) {
+		this.createModulePackage = createModulePackage;
 	}
 
 

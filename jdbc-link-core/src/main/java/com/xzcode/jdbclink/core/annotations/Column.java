@@ -7,6 +7,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import com.xzcode.jdbclink.core.entity.model.EntityField;
+
 /**
  * 列信息注解
  * 
@@ -26,7 +28,7 @@ public @interface Column {
 	 * 2017-05-26
 	 */
     String name() default "";
-
+    
     /**
      * 是否可为 null
      * @return

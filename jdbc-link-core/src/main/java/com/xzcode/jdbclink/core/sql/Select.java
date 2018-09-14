@@ -3,35 +3,33 @@ package com.xzcode.jdbclink.core.sql;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.xzcode.jdbclink.core.EntityInfo;
 import com.xzcode.jdbclink.core.JdbcLink;
-import com.xzcode.jdbclink.core.cache.IEntityInfoCache;
+import com.xzcode.jdbclink.core.JdbcLinkConfig;
+import com.xzcode.jdbclink.core.entity.EntityInfo;
+import com.xzcode.jdbclink.core.entity.model.EntityField;
 import com.xzcode.jdbclink.core.format.DefaultKeyFormatter;
 import com.xzcode.jdbclink.core.format.DefaultValueFormatter;
 import com.xzcode.jdbclink.core.format.KeyFormatter;
 import com.xzcode.jdbclink.core.format.ValueFormatter;
-import com.xzcode.jdbclink.core.models.Pager;
+import com.xzcode.jdbclink.core.models.JdbcLinkPager;
 import com.xzcode.jdbclink.core.models.SqlAndParams;
-import com.xzcode.jdbclink.core.pool.string.StringBuilderPool;
+import com.xzcode.jdbclink.core.resolver.ISqlResolver;
 import com.xzcode.jdbclink.core.sql.groupby.GroupByParam;
 import com.xzcode.jdbclink.core.sql.groupby.having.Having;
-import com.xzcode.jdbclink.core.sql.impl.EntityResultSetExtractor;
-import com.xzcode.jdbclink.core.sql.impl.EntityRowMapper;
-import com.xzcode.jdbclink.core.sql.impl.ListMapRowMapper;
 import com.xzcode.jdbclink.core.sql.interfaces.AliasAndPrefix;
 import com.xzcode.jdbclink.core.sql.interfaces.GroupByAble;
 import com.xzcode.jdbclink.core.sql.interfaces.HavingAble;
@@ -48,20 +46,18 @@ import com.xzcode.jdbclink.core.sql.param.select.EachRowMapParam;
 import com.xzcode.jdbclink.core.sql.param.select.SelectParam;
 import com.xzcode.jdbclink.core.sql.param.select.SingleClolumnListMapExecution;
 import com.xzcode.jdbclink.core.sql.param.select.SingleColumnParam;
-import com.xzcode.jdbclink.core.sql.param.select.concat.ConcatColumn;
-import com.xzcode.jdbclink.core.sql.param.select.concat.ConcatValue;
-import com.xzcode.jdbclink.core.sql.param.select.concat.IConcatParam;
+import com.xzcode.jdbclink.core.sql.resultset.EntityResultSetExtractor;
+import com.xzcode.jdbclink.core.sql.resultset.EntityRowMapper;
+import com.xzcode.jdbclink.core.sql.resultset.ListMapRowMapper;
 import com.xzcode.jdbclink.core.sql.where.Where;
+import com.xzcode.jdbclink.core.util.ParamUtil;
 import com.xzcode.jdbclink.core.util.ShowSqlUtil;
-import com.xzcode.jdbclink.core.util.SqlUtil;
 
-public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T>,GroupByAble<Select<T>>,WhereAble<Select<T>, T>,JoinAble<Select<T>, T>,LimitAble<Select<T>>, OrderAble<T>, QueryAble<T>, AliasAndPrefix{
+public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T>>, WhereAble<Select<T>, T>, JoinAble<Select<T>, T>, LimitAble<Select<T>>, OrderAble<T>, QueryAble<T>, AliasAndPrefix{
+	
+	protected JdbcLinkConfig config;
 	
 	protected String mainAlias = ""; //主表别名
-	
-	protected boolean distinct = false;
-	
-	//private List<String> columns;
 	
 	private List<EachRowMapParam> eachRowMapParams;
 	
@@ -93,65 +89,56 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 	
 	protected JdbcLink jdbcLink;
 	
-	public Select(Class<T> clazz, JdbcTemplate jdbcTemplate, StringBuilderPool stringBuilderPool, IEntityInfoCache entityInfoCache) {
-		this.jdbcTemplate = jdbcTemplate;
-		this.stringBuilderPool = stringBuilderPool;
-		this.entityInfoCache = entityInfoCache;
+	/** 是否生成count sql **/
+	protected boolean createCountSql;
+	
+	
+	protected ISqlResolver sqlResolver;
+	
+	
+	public Select(Class<T> clazz, JdbcLinkConfig config) {
+		this.entityInfo = config.getEntityInfoCache().getEntityInfo(clazz);
+		this.sqlResolver = config.getSqlResolver();
+		this.config = config;
 		this.clazz = clazz;
-		this.entityInfo = super.entityInfoCache.getEntityInfo(clazz);
+		mainAlias = this.entityInfo.getAlias();
 	}
 	
 	
-	public Select<T> column(String tableAlias, String column, String alias) {
+	public Select<T> column(String tableAlias, EntityField field, String alias) {
 		
 		SelectParam selectParam = null;
 		selectParam = new SelectParam();
 		selectParam.setTableAlias(tableAlias);
-		selectParam.setColumn(column);
+		selectParam.setField(field);
 		selectParam.setAlias(alias);
 		selectParam.setSelect(this);
 		addSelectParams(selectParam);
-		
 		return this;
 	}
-	public Select<T> column(String tableAlias, String column) {
-		return this.column(tableAlias, column, null);
-	}
 	
-	public Select<T> column(String column) {
-		return this.column(null, column, null);
+public Select<T> column(EntityField field, String alias) {
+		return this.column(field.getTableAlias(), field, alias);
 	}
 	
 	
-	public Select<T> columnIfNull(String column, Object defValue, String columnAlias) {
+	public Select<T> column(String tableAlias, EntityField field) {
+		return this.column(tableAlias, field, null);
+	}
+	
+	public Select<T> column(EntityField field) {
+		return this.column(field.getTableAlias(), field, null);
+	}
+	
+	public Select<T> column(String sqlPart) {
 		
-		return this.columnIfNull(null, column, defValue, columnAlias);
+		SelectParam selectParam = new SelectParam();
+		selectParam.setType(SelectParam.TypeConstant.SQL_PART);
+		selectParam.setSqlPart(sqlPart);
+		addSelectParams(selectParam);
+		return this;
 	}
 	
-	public Select<T> columnIfNull(String tableAlias, String column, Object defValue, String columnAlias) {
-		if (defValue == null) {
-			throw new NullPointerException("defValue can't not be null!");
-		}
-		Object defValuePart = null;
-		
-		if (defValue instanceof String) {
-			defValuePart = "'" + defValue + "'";
-		}else {
-			defValuePart = defValue;
-		}
-		
-		if (tableAlias == null) {
-			tableAlias = "";
-		}else {
-			tableAlias += ".";
-		}
-		
-		return this.column("IFNULL(" + tableAlias + column +", " + defValuePart +") as "+ columnAlias);
-	}
-	
-	public Select<T> columnAlias(String column, String alias) {
-		return this.column(null, column, alias);
-	}
 	
 	public Select<T> columnForEach(EachRowMapExecution execution) {
 		
@@ -165,7 +152,7 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 		this.addSingleColumnParam(new SingleColumnParam(resultAlias, outerColumnName, innerColumnName, execution));
 		return this;
 	}
-	
+	/*
 	public Select<T> columnForSingleCol(
 			String resultAlias, 
 			String outerColumnName,
@@ -184,17 +171,17 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 		
 		return this;
 	}
-	
-	public Select<T> count(String tableAlias, String column, String alias) {
-		return this.column("count("+tableAlias+"."+ column +") " + alias);
+	*/
+	public Select<T> count(String tableAlias, EntityField field, String alias) {
+		return this.column("count("+tableAlias+"."+ field.getFieldName() +") " + alias);
 	}
 	
-	public Select<T> count(String column, String alias) {
-		return this.column("count("+ column +") " + alias);
+	public Select<T> count(EntityField field, String alias) {
+		return this.column("count("+field.getTableAlias()+"."+ field.getFieldName() +") " + alias);
 	}
 	
-	public Select<T> count(String column) {
-		return this.column("count("+ column +")");
+	public Select<T> count(EntityField field) {
+		return this.column("count("+field.getTableAlias()+"."+ field.getFieldName() +") " );
 	}
 	
 	public Select<T> countAll(String alias) {
@@ -205,86 +192,53 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 		return this.column("count(*)");
 	}
 	
-	public Select<T> concat(String alias, IConcatParam...columns){
-		return concat(columns, alias);
+	/**
+	 * sql参数拼接
+	 * @param sqlPart
+	 * @return
+	 * 
+	 * @author zai
+	 * 2018-09-11 10:31:45
+	 */
+	public Select<T> columnSql(Object...sqlPart){
+		return this.column(ParamUtil.getSqlParam(sqlPart));
 	}
 	
-	public Select<T> concat(IConcatParam[] columns, String alias) {
-		StringBuilder sb = this.stringBuilderPool.get();
-		sb.append("concat(");
-		for (IConcatParam column : columns) {
-			if (column instanceof ConcatColumn) {
-				ConcatColumn cc = (ConcatColumn) column;
-				if (StringUtils.isNotEmpty(cc.getTableAlias())) {
-					sb.append(cc.getTableAlias());
-					sb.append(".");				
-				}
-				sb.append(cc.getColumn());
-				sb.append(",");
-			}else if (column instanceof ConcatValue) {
-				ConcatValue cv = (ConcatValue) column;
-				sb.append("'").append(cv.getValue()).append("'");
-				sb.append(",");
-			}
-			
-		}
-		sb.setLength(sb.length() - 1);
-		sb.append(") ");
-		sb.append(alias);
-		
-		Select<T> column = this.column(sb.toString());
-		this.stringBuilderPool.returnOject(sb);
-		
-		return column;
-	}
-	
-	/*public Select<T> concat(String[] columns, String alias) {
-		StringBuilder sb = this.stringBuilderPool.get();
-		sb.append("concat(");
-		for (String column : columns) {
-			if (StringUtils.isNotEmpty(column)) {
-				sb.append(column);
-				sb.append(".");				
-			}
-			sb.append(column);
-			sb.append(",");
-		}
-		sb.setLength(sb.length() - 1);
-		sb.append(") ");
-		sb.append(alias);
-		
-		Select<T> column = this.column(sb.toString());
-		this.stringBuilderPool.returnOject(sb);
-		
-		return column;
-	}*/
 	
 	
-	@SuppressWarnings("unchecked")
-	public T selectById(Object uid) {
-		Object entity = this.jdbcLink.select(entityInfo.getClazz())
-		.where()
-			.and().eq(this.entityInfo.getId(), uid)
-		.queryEntity()
-		;
-		
-		return (T) entity;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public T selectByKey(String key, Object val) {
-		return (T) this.jdbcLink.select(entityInfo.getClazz())
+	public T byField(EntityField field, Object val) {
+		return (T) this
 				.where()
-					.and().eq(key, val)
+					.and().eq(field, val)
 				.queryEntity()
 				;
 	}
-
 	
-	public Select<T> distinct() {
-		this.distinct = true;
-		return this;
+	public List<T> byFieldForList(EntityField field, Object val) {
+		return this
+				.where()
+					.and().eq(field, val)
+				.queryList()
+				;
 	}
+	
+	public Map<String, Object> byFieldForMap(EntityField field, Object val) {
+		return this
+				.where()
+					.and().eq(field, val)
+				.queryMap()
+				;
+	}
+	
+	public List<Map<String, Object>> byFieldForListMap(EntityField field, Object val) {
+		return this
+				.where()
+					.and().eq(field, val)
+				.queryListMap()
+				;
+	}
+	
+
 	
 	@Override
 	public Select<T> orderBySorting(String orderBy, String sorting) {
@@ -378,11 +332,11 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 	
 	
 	public <E> E queryObject(Class<E> ObjectClazz) {
-		SqlAndParams sqlAndParams = SqlUtil.handelSelect(this, false);
+		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
 		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
 		try {
 			
-			return this.jdbcTemplate.queryForObject(sqlAndParams.getSql(), ObjectClazz, sqlAndParams.getArgs().toArray());
+			return this.config.getJdbcTemplate().queryForObject(sqlAndParams.getSql(), ObjectClazz, sqlAndParams.getArgs().toArray());
 		} catch (EmptyResultDataAccessException  e) {
 			return null;
 		}
@@ -391,22 +345,26 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 	@Override
 	public T queryEntity() {
 		try {
-			SqlAndParams sqlAndParams = SqlUtil.handelSelect(this, false);
+			SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
 			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-			return this.jdbcTemplate.query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new EntityResultSetExtractor<>(clazz, entityInfo));
+			return this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new EntityResultSetExtractor<>(clazz, entityInfo));
 		} catch (EmptyResultDataAccessException  e) {
 			return null;
 		}
 	}
 	
 	@Override
-	public Pager<T> pageEntity() {
-		SqlAndParams sqlAndParams = SqlUtil.handelSelect(this, true);
+	public JdbcLinkPager<T> pageEntity() {
+		this.createCountSql = true;
+		if (this.limit == null) {
+			this.limit = DIFAULT_LIMIT_PARAM;
+		}
+		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
 		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		List<T> items = this.jdbcTemplate.query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new EntityRowMapper<T>(clazz, entityInfo));
+		List<T> items = this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new EntityRowMapper<T>(clazz, entityInfo));
 		
-		Integer total = jdbcTemplate.queryForObject(sqlAndParams.getCountSql(), Integer.class, sqlAndParams.getCountParams());
-		Pager<T> pager = new Pager<>();
+		Integer total = config.getJdbcTemplate().queryForObject(sqlAndParams.getCountSql(), Integer.class, sqlAndParams.getCountParams());
+		JdbcLinkPager<T> pager = new JdbcLinkPager<>();
 		
 		pager.setTotal(total);
 		pager.setItems(items);
@@ -417,17 +375,17 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 	}
 	
 	public List<T> queryList() {
-		SqlAndParams sqlAndParams = SqlUtil.handelSelect(this, false);
+		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
 		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		List<T> list = this.jdbcTemplate.query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new EntityRowMapper<T>(clazz, entityInfo));
+		List<T> list = this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new EntityRowMapper<T>(clazz, entityInfo));
 		return list;
 	}
 	
 	public Map<String, Object> queryMap() {
 		
-		SqlAndParams sqlAndParams = SqlUtil.handelSelect(this, false);
+		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
 		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		Map<String, Object> resultMap = jdbcTemplate.query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new ResultSetExtractor<Map<String, Object>>(){
+		Map<String, Object> resultMap = config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new ResultSetExtractor<Map<String, Object>>(){
 
 			@Override
 			public Map<String, Object> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -462,9 +420,9 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 	
 	@Override
 	public <F> List<F> queryFirstColumn( Class<F> f) {
-		SqlAndParams sqlAndParams = SqlUtil.handelSelect(this, false);
+		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
 		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		List<F> resultList = jdbcTemplate.query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new ResultSetExtractor<List<F>>(){
+		List<F> resultList = config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new ResultSetExtractor<List<F>>(){
 
 			@SuppressWarnings("unchecked")
 			@Override
@@ -487,9 +445,9 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 	
 	@Override
 	public List<Map<String, Object>> queryListMap() {
-		SqlAndParams sqlAndParams = SqlUtil.handelSelect(this, false);
+		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
 		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		List<Map<String, Object>> resultListMap = jdbcTemplate.query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new ListMapRowMapper(getKeyFormatter(), getValueFormatter()) );
+		List<Map<String, Object>> resultListMap = config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new ListMapRowMapper(getKeyFormatter(), getValueFormatter()) );
 		
 		handleColumnExecution(resultListMap);
 		
@@ -571,21 +529,24 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 	
 
 	@Override
-	public Pager<Map<String, Object>> pageListMap() {
-
-		SqlAndParams sqlAndParams = SqlUtil.handelSelect(this, true);
+	public JdbcLinkPager<Map<String, Object>> pageListMap() {
+		this.createCountSql = true;
+		if (this.limit == null) {
+			this.limit = DIFAULT_LIMIT_PARAM;
+		}
+		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
 		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		List<Map<String, Object>> items = jdbcTemplate.query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new ListMapRowMapper(getKeyFormatter(), getValueFormatter()) );
+		List<Map<String, Object>> items = config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new ListMapRowMapper(getKeyFormatter(), getValueFormatter()) );
 		
 		handleColumnExecution(items);
 		
-		Integer total = jdbcTemplate.queryForObject(sqlAndParams.getCountSql(), sqlAndParams.getCountParams().toArray(), new RowMapper<Integer>(){
+		Integer total = config.getJdbcTemplate().queryForObject(sqlAndParams.getCountSql(), sqlAndParams.getCountParams().toArray(), new RowMapper<Integer>(){
 			@Override
 			public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
 				return rs.getInt(1);
 			}
 		});
-		Pager<Map<String, Object>> pager = new Pager<Map<String, Object>>();
+		JdbcLinkPager<Map<String, Object>> pager = new JdbcLinkPager<Map<String, Object>>();
 		
 		pager.setTotal(total);
 		pager.setItems(items);
@@ -661,18 +622,24 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 	public HavingAble<Select<T>, T> getHavingAble() {
 		return this;
 	}
-	
-	
 
-	
-	//------------------------------------
+
+	@Override
+	public Select<T> setLimitParam(LimitParam limitParam) {
+		this.limit = limitParam;
+		return this;
+	}
 	
 	@Override
 	public Having<Select<T>, T> having() {
 		this.having = new Having<Select<T>, T>(this);
 		return this.having;
 	}
-
+	
+	//------------------------------------
+	
+	
+	
 	public Map<String, Join<Select<T>, T>> getJoins() {
 		return joins;
 	}
@@ -689,11 +656,6 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 		return limit;
 	}
 	
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
-
-
 
 	public void setMainAlias(String mainAlias) {
 		this.mainAlias = mainAlias;
@@ -781,11 +743,30 @@ public class Select<T> extends AbstractCommon implements HavingAble<Select<T>, T
 		this.jdbcLink = jdbcLink;
 	}
 	
-
-	@Override
-	public Select<T> setLimitParam(LimitParam limitParam) {
-		this.limit = limitParam;
-		return this;
+	public boolean isCreateCountSql() {
+		return createCountSql;
 	}
+	
+	public void setCreateCountSql(boolean createCountSql) {
+		this.createCountSql = createCountSql;
+	}
+	
+	public void setSqlResolver(ISqlResolver sqlResolver) {
+		this.sqlResolver = sqlResolver;
+	}
+	
+	public ISqlResolver getSqlResolver() {
+		return sqlResolver;
+	}
+	
+	@Override
+	public JdbcLinkConfig getConfig() {
+		return config;
+	}
+	
+	public void setConfig(JdbcLinkConfig config) {
+		this.config = config;
+	}
+
 
 }

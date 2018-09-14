@@ -4,6 +4,9 @@ import com.xzcode.jdbclink.core.annotations.Column;
 import com.xzcode.jdbclink.core.annotations.Id;
 import com.xzcode.jdbclink.core.annotations.Table;
 import com.xzcode.jdbclink.core.annotations.Entity;
+import com.xzcode.jdbclink.core.entity.IEntity;
+import com.xzcode.jdbclink.core.entity.model.EntityField;
+
 <#list tableEntityInfo.importJavaTypes as imp>  
 import ${imp};
 </#list>
@@ -15,13 +18,13 @@ import ${imp};
  * ${.now?string("yyyy-MM-dd HH:mm:ss")}
  */
 @Entity
-@Table(name = "${tableEntityInfo.tableName}")
-public class ${tableEntityInfo.entityClassName} {
+@Table(name = ${tableEntityInfo.entityClassName}.__TABLE_NAME__, alias = ${tableEntityInfo.entityClassName}.__TABLE_NAME__)
+public class ${tableEntityInfo.entityClassName} implements IEntity {
 
 	/**
 	 * ${tableEntityInfo.tableComment} 表名
 	 */
-	public static final String __ = "${tableEntityInfo.tableName}";
+	public static final String __TABLE_NAME__ = "${tableEntityInfo.tableName}";
 
 	//列名常量
 	
@@ -29,21 +32,10 @@ public class ${tableEntityInfo.entityClassName} {
 	/**
 	 * ${col.comment}
 	 */
-	public static final String ${col.name?upper_case} = "${col.name}";
+	public static final EntityField ${col.name?upper_case} = new EntityField("${col.name}", "${col.propertyName}", ${tableEntityInfo.entityClassName}.__TABLE_NAME__);
 	
 	</#list>
 	
-	/**
-	 * 属性名称
-	 */
-	public static interface PropName {
-		<#list tableEntityInfo.columns as col>   
-		/**
-		 * ${col.comment} -- (属性名称) 
-		 */
-		String ${col.name?upper_case} = "${col.propertyName}";
-		</#list>
-	};
 	
 <#list tableEntityInfo.columns as col>   
 	<#if col.columnComment??>
@@ -70,7 +62,7 @@ public class ${tableEntityInfo.entityClassName} {
 	 * ${col.comment}
 	 */
 	<#if col.isPrimaryKey>@Id</#if>
-	@Column(name = ${col.name?upper_case})
+	@Column(name = "${col.name}")
 	private ${col.javaType} ${col.propertyName};
 	
 </#list>

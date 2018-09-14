@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.xzcode.jdbclink.core.cache.IEntityInfoCache;
+import com.xzcode.jdbclink.core.entity.IEntity;
+import com.xzcode.jdbclink.core.entity.model.EntityField;
 import com.xzcode.jdbclink.core.pool.string.StringBuilderPool;
 import com.xzcode.jdbclink.core.sql.BatchInsert;
 import com.xzcode.jdbclink.core.sql.Delete;
@@ -62,67 +64,67 @@ public class JdbcLink{
 	
 	
 	public Insert insert(Class<?> clazz) {
-		Insert insert = new Insert(clazz, jdbcTemplate, stringBuilderPool, entityInfoCache);
+		Insert insert = new Insert(clazz, config);
 		return insert;
 	}
 	
-	public int insert(Object entity) {
-		Insert insert = new Insert(entity.getClass(), jdbcTemplate, stringBuilderPool, entityInfoCache);
+	public int insert(IEntity entity) {
+		Insert insert = new Insert(entity.getClass(), config);
 		return insert.insert(entity, false);
 	}
 	
-	public int insertSelective(Object entity) {
-		Insert insert = new Insert(entity.getClass(), jdbcTemplate, stringBuilderPool, entityInfoCache);
+	public int insertSelective(IEntity entity) {
+		Insert insert = new Insert(entity.getClass(), config);
 		return insert.insert(entity, true);
 	}
 	
-	public int insert(Object entity, boolean injectAutoIncrementId) {
-		Insert insert = new Insert(entity.getClass(), jdbcTemplate, stringBuilderPool, entityInfoCache);
+	public int insert(IEntity entity, boolean injectAutoIncrementId) {
+		Insert insert = new Insert(entity.getClass(), config);
 		return insert.insert(entity, injectAutoIncrementId);
 	}
 	
 	
-	public int batchInsert(List<?> entitys) {
-		BatchInsert insert = new BatchInsert(jdbcTemplate, stringBuilderPool, entityInfoCache);
-		return insert.batchInsert(entitys, false);
+	public int batchInsert(List<IEntity> entities) {
+		BatchInsert insert = new BatchInsert(config);
+		return insert.batchInsert(entities, false);
 	}
 	
-	public int batchInsertSelective(List<?> entitys) {
-		BatchInsert insert = new BatchInsert(jdbcTemplate, stringBuilderPool, entityInfoCache);
-		return insert.batchInsert(entitys, true);
+	public int batchInsertSelective(List<IEntity> entities) {
+		BatchInsert insert = new BatchInsert(config);
+		return insert.batchInsert(entities, true);
 	}
 	
-	public int batchInsert(List<Object> entitys, boolean injectAutoIncrementId) {
-		BatchInsert insert = new BatchInsert(jdbcTemplate, stringBuilderPool, entityInfoCache);
-		return insert.batchInsert(entitys, injectAutoIncrementId);
+	public int batchInsert(List<IEntity> entities, boolean injectAutoIncrementId) {
+		BatchInsert insert = new BatchInsert(config);
+		return insert.batchInsert(entities, injectAutoIncrementId);
 	}
 	
 	
 	public <T> Select<T> select(Class<T> clazz) {
-		Select<T> select = new Select<>(clazz, jdbcTemplate, stringBuilderPool, entityInfoCache);
+		Select<T> select = new Select<>(clazz, config);
 		select.setJdbcLink(this);
 		return select;
 	}
 	
 	public <T> Select<T> select(Class<T> clazz, String tableAlias) {
-		Select<T> select = new Select<>(clazz, jdbcTemplate, stringBuilderPool, entityInfoCache);
+		Select<T> select = new Select<>(clazz, config);
 		select.setMainAlias(tableAlias);
 		select.setJdbcLink(this);
 		return select;
 	}
-	
+	/*
 	public <T> T select(Object uid, Class<T> clazz) {
-		Select<T> select = new Select<>(clazz, jdbcTemplate, stringBuilderPool, entityInfoCache);
+		Select<T> select = new Select<>(clazz, config);
 		select.setJdbcLink(this);
 		return select.selectById(uid);
 	}
 	
 	public <T> T select(String key, Object val, Class<T> clazz) {
-		Select<T> select = new Select<>(clazz, jdbcTemplate, stringBuilderPool, entityInfoCache);
+		Select<T> select = new Select<>(clazz, config);
 		select.setJdbcLink(this);
 		return select.selectByKey(key, val);
 	}
-	
+	*/
 	public List<Map<String, Object>> select(String sql) {
 		return this.jdbcTemplate.queryForList(sql);
 	}
@@ -133,33 +135,33 @@ public class JdbcLink{
 	
 	
 	public Update update(Class<?> clazz) {
-		Update update = new Update(clazz, jdbcTemplate, stringBuilderPool, entityInfoCache);
+		Update update = new Update(clazz, config);
 		return update;
 	}
 	
-	public int update(Object entity) {
-		Update update = new Update(entity.getClass(), jdbcTemplate, stringBuilderPool, entityInfoCache);
+	public int update(IEntity entity) {
+		Update update = new Update(entity.getClass(), config);
 		return update.update(entity);
 	}
 	
 	
-	public int updateNullable(Object entity, String...nullableColumns) {
-		Update update = new Update(entity.getClass(), jdbcTemplate, stringBuilderPool, entityInfoCache);
+	public int updateNullable(IEntity entity, EntityField...nullableFields) {
+		Update update = new Update(entity.getClass(), config);
 		LinkedList<Object> linkedList = new LinkedList<>();
 		linkedList.add(entity);
-		return update.updateNullable(entity, nullableColumns);
+		return update.updateNullable(entity, nullableFields);
 	}
 	
 	
 	public Delete delete(Class<?> clazz) {
-		Delete delete = new Delete(clazz, jdbcTemplate, stringBuilderPool, entityInfoCache);
+		Delete delete = new Delete(clazz, config);
 		return delete;
 		
 	}
 	
 	public int delete(Object uid, Class<?> clazz) {
-		Delete delete = new Delete(clazz, jdbcTemplate, stringBuilderPool, entityInfoCache);
-		return delete.deleteById(uid, clazz);
+		Delete delete = new Delete(clazz, config);
+		return delete.byId(uid);
 		
 	}
 	

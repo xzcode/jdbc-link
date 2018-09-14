@@ -3,7 +3,7 @@ package com.xzcode.jdbclink.core.sql.update;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.xzcode.jdbclink.core.sql.Select;
+import com.xzcode.jdbclink.core.entity.model.EntityField;
 import com.xzcode.jdbclink.core.sql.interfaces.ExecuteAble;
 import com.xzcode.jdbclink.core.sql.interfaces.Satisfy;
 import com.xzcode.jdbclink.core.sql.interfaces.WhereAble;
@@ -44,18 +44,28 @@ public class UpdateSet implements ExecuteAble,WhereAble<UpdateSet, UpdateSet>{
 		return updateParam;
 	}
 	
-	public UpdateSet param(String key, Object value) {
-		this.addParam(new UpdateParam(this, key, value));
+	public UpdateSet param(EntityField field, Object value) {
+		this.addParam(new UpdateParam(this, field, value));
 		return this;
 	}
 	
-	public UpdateSet paramKey(String key, String key2) {
-		this.addParam(new UpdateParam(this, key, key2));
+	public UpdateSet param(EntityField field, EntityField field2) {
+		this.addParam(new UpdateParam(this, field, field2));
 		return this;
 	}
 	
-	public UpdateSet paramIncrease(String key, Object value){
-		return paramKey(key, key +"+"+ value);
+	public UpdateSet paramIncrease(EntityField field, Object value){
+		UpdateParam updateParam = new UpdateParam(this);
+		updateParam.sqlParam(field.getFieldName(), " = ", field.getFieldName() + "+" + value);
+		this.addParam(updateParam);
+		return this;
+	}
+	
+	public UpdateSet sqlParam(Object...sqlPart){
+		UpdateParam updateParam = new UpdateParam(this);
+		updateParam.sqlParam(sqlPart);
+		this.addParam(updateParam);		
+		return this;
 	}
 	
 	protected UpdateSet addParam(UpdateParam param) {

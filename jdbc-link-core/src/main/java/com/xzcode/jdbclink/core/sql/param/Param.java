@@ -1,7 +1,12 @@
 package com.xzcode.jdbclink.core.sql.param;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import com.xzcode.jdbclink.core.entity.model.EntityField;
 import com.xzcode.jdbclink.core.sql.Select;
 import com.xzcode.jdbclink.core.sql.interfaces.Satisfy;
+import com.xzcode.jdbclink.core.util.ParamUtil;
 
 
 /**
@@ -21,9 +26,9 @@ public class Param<T> {
 	
 	protected String tableAlias2 = "";
 	
-	protected String key;
+	protected EntityField field;
 	
-	protected String key2;
+	protected EntityField field2;
 	
 	protected String tag;
 	
@@ -37,8 +42,25 @@ public class Param<T> {
 	
 	protected Object[] values;
 	
-	public Param(T t, String key, Object val) {
-		this.key = key;
+	protected String sqlpart;
+	
+	protected int type = 1; //参数类型，1 EntityField， 2 sqlpart
+	
+	/**
+	 * 参数类型常量
+	 * 
+	 * @author zai
+	 * 2018-09-10 17:20:57
+	 */
+	public static interface TypeConstant{
+		
+		int ENTITY_FIELD = 1;
+		
+		int SQL_PART = 2;
+	}
+	
+	public Param(T t, EntityField field, Object val) {
+		this.field = field;
 		this.val = val;
 		this.t = t;
 	}
@@ -59,60 +81,97 @@ public class Param<T> {
 	}
 	
 	
+	public T sqlParam(Object...sqlPart) {
+		this.type = TypeConstant.SQL_PART;
+		this.sqlpart = ParamUtil.getSqlParam(sqlPart);
+		return this.t;
+	}
+	
 	
 	
 	/**
 	 * 等于
-	 * @param key
+	 * @param field
 	 * @param value
 	 * @return
 	 * 
 	 * @author zai
 	 * 2017-05-10
 	 */
-	public T eq(String key, Object value) {
-			this.key = key;
+	public T eq(EntityField field, Object value) {
+			this.field = field;
 			this.val = value;
 			this.tag = "=";
+			this.tableAlias = field.getTableAlias();
 			return this.t;
 	}
 	
-	public T eqKey(String key, String key2) {
-		this.key = key;
-		this.key2 = key2;
+	public T eq(EntityField field, EntityField field2) {
+		this.field = field;
+		this.field2 = field2;
 		this.tag = "=";
+		this.tableAlias = field.getTableAlias();
+		this.tableAlias2 = field2.getTableAlias();
+		return this.t;
+	}
+	
+	public T eqfield(EntityField field, EntityField field2) {
+		this.field = field;
+		this.field2 = field2;
+		this.tag = "=";
+		this.tableAlias = field.getTableAlias();
+		this.tableAlias2 = field2.getTableAlias();
 		return this.t;
 	}
 	
 	
-	public T eq(String tableAlias, String key, Object value) {
+	public T eq(String tableAlias, EntityField field, Object value) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.val = value;
 		this.tag = "=";
 		return this.t;
 	}
 	
-	public T eq(String tableAlias, String key, String tableAlias2, String key2) {
+	public T eq(String tableAlias, EntityField field, String tableAlias2, EntityField field2) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.tableAlias2 = tableAlias2;
-		this.key2 = key2;
+		this.field2 = field2;
+		this.tag = "=";
+		return this.t;
+	}
+	
+	public T eq(EntityField field, String tableAlias2, EntityField field2) {
+		this.tableAlias = field.getTableAlias();
+		this.field = field;
+		this.tableAlias2 = tableAlias2;
+		this.field2 = field2;
+		this.tag = "=";
+		return this.t;
+	}
+	
+	public T eq(String tableAlias, EntityField field, EntityField field2) {
+		this.tableAlias = tableAlias;
+		this.field = field;
+		this.tableAlias2 = field2.getTableAlias();
+		this.field2 = field2;
 		this.tag = "=";
 		return this.t;
 	}
 	
 	
-	public T eq(String key, Select<T> select) {
-		this.key = key;
+	public T eq(EntityField field, Select<T> select) {
+		this.field = field;
 		this.select = select;
 		this.tag = "=";
+		this.tableAlias = field.getTableAlias();
 		return this.t;
 	}
 	
-	public T eq(String tableAlias,String key, Select<T> select) {
+	public T eq(String tableAlias,EntityField field, Select<T> select) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.select = select;
 		this.tag = "=";
 		return this.t;
@@ -120,54 +179,58 @@ public class Param<T> {
 	
 	/**
 	 * 小于
-	 * @param key
+	 * @param field
 	 * @param value
 	 * @return
 	 * 
 	 * @author zai
 	 * 2017-05-10
 	 */
-	public T lt(String key, Object value) {
-			this.key = key;
+	public T lt(EntityField field, Object value) {
+			this.field = field;
 			this.val = value;
 			this.tag = "<";
+			this.tableAlias = field.getTableAlias();
 			return this.t;
 	}
 	
-	public T ltKey(String key, String key2) {
-		this.key = key;
-		this.key2 = key2;
+	public T ltfield(EntityField field, EntityField field2) {
+		this.field = field;
+		this.field2 = field2;
 		this.tag = "<";
+		this.tableAlias = field.getTableAlias();
+		this.tableAlias2 = field2.getTableAlias();
 		return this.t;
 }
 	
-	public T lt(String tableAlias,String key, Object value) {
+	public T lt(String tableAlias,EntityField field, Object value) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.val = value;
 		this.tag = "<";
 		return this.t;
 	}
 	
-	public T lt(String tableAlias, String key, String tableAlias2, String key2) {
+	public T lt(String tableAlias, EntityField field, String tableAlias2, EntityField field2) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.tableAlias2 = tableAlias2;
-		this.key2 = key2;
+		this.field2 = field2;
 		this.tag = "<";
 		return this.t;
 	}
 	
-	public T lt(String key, Select<T> select) {
-		this.key = key;
+	public T lt(EntityField field, Select<T> select) {
+		this.field = field;
 		this.select = select;
 		this.tag = "<";
+		this.tableAlias = field.getTableAlias();
 		return this.t;
 	}
 	
-	public T lt(String tableAlias,String key, Select<T> select) {
+	public T lt(String tableAlias,EntityField field, Select<T> select) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.select = select;
 		this.tag = "<";
 		return this.t;
@@ -175,48 +238,52 @@ public class Param<T> {
 	
 	/**
 	 * 大于
-	 * @param key
+	 * @param field
 	 * @param value
 	 * @return
 	 * 
 	 * @author zai
 	 * 2017-05-10
 	 */
-	public T gt(String key, Object value) {
-			this.key = key;
+	public T gt(EntityField field, Object value) {
+			this.field = field;
 			this.val = value;
 			this.tag = ">";
+			this.tableAlias = field.getTableAlias();
 			return this.t;
 	}
 	
-	public T gtKey(String key, String key2) {
-		this.key = key;
-		this.key2 = key2;
+	public T gtKey(EntityField field, EntityField field2) {
+		this.field = field;
+		this.field2 = field2;
 		this.tag = ">";
+		this.tableAlias = field.getTableAlias();
+		this.tableAlias2 = field2.getTableAlias();
 		return this.t;
 	}
 	
-	public T gt(String tableAlias, String key, Object value) {
+	public T gt(String tableAlias, EntityField field, Object value) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.val = value;
 		this.tag = ">";
 		return this.t;
 	}
 	
-	public T gt(String tableAlias, String key, String tableAlias2, String key2) {
+	public T gt(String tableAlias, EntityField field, String tableAlias2, EntityField field2) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.tableAlias2 = tableAlias2;
-		this.key2 = key2;
+		this.field2 = field2;
 		this.tag = ">";
 		return this.t;
 	}
 	
-	public T gt(String key, Select<T> select) {
-		this.key = key;
+	public T gt(EntityField field, Select<T> select) {
+		this.field = field;
 		this.select = select;
 		this.tag = ">";
+		this.tableAlias = field.getTableAlias();
 		return this.t;
 	}
 	
@@ -229,47 +296,50 @@ public class Param<T> {
 	 * @author zai
 	 * 2017-05-10
 	 */
-	public T gtEq(String key, Object value) {
-			this.key = key;
+	public T gtEq(EntityField field, Object value) {
+			this.field = field;
 			this.val = value;
 			this.tag = ">=";
+			this.tableAlias = field.getTableAlias();
 			return this.t;
 	}
 	
-	public T gtEqKey(String key, String key2) {
-		this.key = key;
-		this.key2 = key2;
+	public T gtEqKey(EntityField field, EntityField field2) {
+		this.field = field;
+		this.field2 = field2;
 		this.tag = ">=";
+		this.tableAlias = field.getTableAlias();
+		this.tableAlias2 = field2.getTableAlias();
 		return this.t;
 	}
 	
-	public T gtEq(String tableAlias,String key, Object value) {
+	public T gtEq(String tableAlias,EntityField field, Object value) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.val = value;
 		this.tag = ">=";
 		return this.t;
 	}
 	
-	public T gtEq(String tableAlias, String key, String tableAlias2, String key2) {
+	public T gtEq(String tableAlias, EntityField field, String tableAlias2, EntityField field2) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.tableAlias2 = tableAlias2;
-		this.key2 = key2;
+		this.field2 = field2;
 		this.tag = ">=";
 		return this.t;
 	}
 	
-	public T gtEq(String key, Select<T> select) {
-		this.key = key;
+	public T gtEq(EntityField field, Select<T> select) {
+		this.field = field;
 		this.select = select;
 		this.tag = ">=";
 		return this.t;
 	}
 	
-	public T gtEq(String tableAlias,String key, Select<T> select) {
+	public T gtEq(String tableAlias,EntityField field, Select<T> select) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.select = select;
 		this.tag = ">=";
 		return this.t;
@@ -284,47 +354,50 @@ public class Param<T> {
 	 * @author zai
 	 * 2017-05-10
 	 */
-	public T ltEq(String key, Object value) {
-			this.key = key;
+	public T ltEq(EntityField field, Object value) {
+			this.field = field;
 			this.val = value;
 			this.tag = "<=";
+			this.tableAlias = field.getTableAlias();
 			return this.t;
 	}
 	
-	public T ltEqKey(String key, String key2) {
-		this.key = key;
-		this.key2 = key2;
+	public T ltEqKey(EntityField field, EntityField field2) {
+		this.field = field;
+		this.field2 = field2;
 		this.tag = "<=";
+		this.tableAlias = field.getTableAlias();
+		this.tableAlias2 = field2.getTableAlias();
 		return this.t;
 	}
 	
-	public T ltEq(String tableAlias,String key, Object value) {
+	public T ltEq(String tableAlias,EntityField field, Object value) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.val = value;
 		this.tag = "<=";
 		return this.t;
 	}
 	
-	public T ltEq(String tableAlias, String key, String tableAlias2, String key2) {
+	public T ltEq(String tableAlias, EntityField field, String tableAlias2, EntityField field2) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.tableAlias2 = tableAlias2;
-		this.key2 = key2;
+		this.field2 = field2;
 		this.tag = "<=";
 		return this.t;
 	}
 	
-	public T ltEq(String key, Select<T> select) {
-		this.key = key;
+	public T ltEq(EntityField field, Select<T> select) {
+		this.field = field;
 		this.select = select;
 		this.tag = "<=";
 		return this.t;
 	}
 	
-	public T ltEq(String tableAlias,String key, Select<T> select) {
+	public T ltEq(String tableAlias,EntityField field, Select<T> select) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.select = select;
 		this.tag = "<=";
 		return this.t;
@@ -340,32 +413,34 @@ public class Param<T> {
 	 * @author zai
 	 * 2017-05-10
 	 */
-	public T like(String key, Object value) {
-			this.key = key;
-			this.val = value;
-			this.tag = "like";
-		return this.t;
-	}
-	
-	public T like(String tableAlias,String key, Object value) {
-		this.tableAlias = tableAlias;
-		this.key = key;
+	public T like(EntityField field, Object value) {
+		this.field = field;
 		this.val = value;
 		this.tag = "like";
-	return this.t;
+		this.tableAlias = field.getTableAlias();
+		return this.t;
 	}
 	
-	
-	public T like(String key, Select<T> select) {
-		this.key = key;
-		this.select = select;
+	public T like(String tableAlias,EntityField field, Object value) {
+		this.tableAlias = tableAlias;
+		this.field = field;
+		this.val = value;
 		this.tag = "like";
 		return this.t;
 	}
 	
-	public T like(String tableAlias,String key, Select<T> select) {
+	
+	public T like(EntityField field, Select<T> select) {
+		this.field = field;
+		this.select = select;
+		this.tag = "like";
+		this.tableAlias = field.getTableAlias();
+		return this.t;
+	}
+	
+	public T like(String tableAlias,EntityField field, Select<T> select) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.select = select;
 		this.tag = "like";
 		return this.t;
@@ -380,16 +455,17 @@ public class Param<T> {
 	 * @author zai
 	 * 2017-05-10
 	 */
-	public T fuzzyLike(String key, Object value) {
-		this.key = key;
+	public T fuzzyLike(EntityField field, Object value) {
+		this.field = field;
 		this.val = "%" + value + "%";
 		this.tag = "like";
+		this.tableAlias = field.getTableAlias();
 		return this.t;
 	}
 	
-	public T fuzzyLike(String tableAlias,String key, Object value) {
+	public T fuzzyLike(String tableAlias, EntityField field, Object value) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.val = "%" + value + "%";
 		this.tag = "like";
 		return this.t;
@@ -402,17 +478,18 @@ public class Param<T> {
 	 * @param value
 	 * @return
 	 */
-	public T locate(String key, Object value) {
-		this.key = key;
+	public T locate(EntityField field, Object value) {
+		this.field = field;
 		//this.val = "locate('" + value +"', "+ key +") > 0";
 		this.val = value;
 		this.tag = "locate";
+		this.tableAlias = field.getTableAlias();
 		return this.t;
 	}
 	
-	public T locate(String tableAlias,String key, Object value) {
+	public T locate(String tableAlias,EntityField field, Object value) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		//this.val = "locate('" + value +"', "+ key +") > 0";
 		this.val = value;
 		this.tag = "locate";
@@ -430,22 +507,23 @@ public class Param<T> {
 	 * @author zai
 	 * 2017-05-23
 	 */
-	public T between(String key, Object betweenFrom, Object betweenTo) {
-			this.key = key;
-			this.tag = "between";
-			this.val = betweenFrom;
-			this.val2 = betweenTo;
+	public T between(EntityField field, Object betweenFrom, Object betweenTo) {
+		this.field = field;
+		this.tag = "between";
+		this.val = betweenFrom;
+		this.val2 = betweenTo;
+		this.tableAlias = field.getTableAlias();
 		return this.t;
 	}
 	
 	
-	public T between(String tableAlias,String key, Object betweenFrom, Object betweenTo) {
+	public T between(String tableAlias,EntityField field, Object betweenFrom, Object betweenTo) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.tag = "between";
 		this.val = betweenFrom;
 		this.val2 = betweenTo;
-	return this.t;
+		return this.t;
 }
 	
 	/**
@@ -454,17 +532,18 @@ public class Param<T> {
 	 * @param values
 	 * @return
 	 */
-	public T in(String key, Object[] values) {
-			this.key = key;
-			//this.val = "(" + StringUtils.join(values, ",") + ")";
-			this.values = values;
-			this.tag = "in";
-			return this.t;
+	public T in(EntityField field, Object[] values) {
+		this.field = field;
+		//this.val = "(" + StringUtils.join(values, ",") + ")";
+		this.values = values;
+		this.tag = "in";
+		this.tableAlias = field.getTableAlias();
+		return this.t;
 	}
 	
-	public T in(String tableAlias,String key, Object[] values) {
+	public T in(String tableAlias,EntityField field, Object[] values) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		//this.val = "(" + StringUtils.join(values, ",") + ")";
 		this.values = values;
 		this.tag = "in";
@@ -478,16 +557,17 @@ public class Param<T> {
 	 * @param select
 	 * @return
 	 */
-	public T in(String key, Select<T> select) {
-		this.key = key;
+	public T in(EntityField field, Select<T> select) {
+		this.field = field;
 		this.select = select;
 		this.tag = "in";
+		this.tableAlias = field.getTableAlias();
 		return this.t;
 	}
 	
-	public T in(String tableAlias,String key, Select<T> select) {
+	public T in(String tableAlias,EntityField field, Select<T> select) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		this.select = select;
 		this.tag = "in";
 		return this.t;
@@ -500,17 +580,18 @@ public class Param<T> {
 	 * @param values
 	 * @return
 	 */
-	public T notIn(String key, Object[] values) {
-		this.key = key;
+	public T notIn(EntityField field, Object[] values) {
+		this.field = field;
 		//this.val = "('" + StringUtils.join(values, "','") +"')";
 		this.values = values;
 		this.tag = "not in";
+		this.tableAlias = field.getTableAlias();
 		return this.t;
 	}
 	
-	public T notIn(String tableAlias,String key, Object[] values) {
+	public T notIn(String tableAlias,EntityField field, Object[] values) {
 		this.tableAlias = tableAlias;
-		this.key = key;
+		this.field = field;
 		//this.val = "('" + StringUtils.join(values, "','") +"')";
 		this.values = values;
 		this.tag = "not in";
@@ -523,42 +604,45 @@ public class Param<T> {
 	 * @param select
 	 * @return
 	 */
-	public T notIn(String key, Select<T> select) {
-		this.key = key;
+	public T notIn(EntityField field, Select<T> select) {
+		this.field = field;
+		this.select = select;
+		this.tag = "not in";
+		this.tableAlias = field.getTableAlias();
+		return this.t;
+	}
+	
+	
+	public T notIn(String tableAlias,EntityField field, Select<T> select) {
+		this.tableAlias = tableAlias;
+		this.field = field;
 		this.select = select;
 		this.tag = "not in";
 		return this.t;
 	}
 	
-	
-	public T notIn(String tableAlias,String key, Select<T> select) {
-		this.tableAlias = tableAlias;
-		this.key = key;
-		this.select = select;
-		this.tag = "not in";
-		return this.t;
-	}
-	
-	public T exists(String key, Select<T> select) {
+	public T exists(EntityField field, Select<T> select) {
 		this.select = select;
 		this.tag = "exists";
+		this.tableAlias = field.getTableAlias();
 		return this.t;
 	}
 	
-	public T exists(String tableAlias,String key, Select<T> select) {
+	public T exists(String tableAlias,EntityField field, Select<T> select) {
 		this.tableAlias = tableAlias;
 		this.select = select;
 		this.tag = "exists";
 		return this.t;
 	}
 	
-	public T notExists(String key, Select<T> select) {
+	public T notExists(EntityField field, Select<T> select) {
 		this.select = select;
 		this.tag = "not exists";
+		this.tableAlias = field.getTableAlias();
 		return this.t;
 	}
 	
-	public T notExists(String tableAlias,String key, Select<T> select) {
+	public T notExists(String tableAlias,EntityField field, Select<T> select) {
 		this.tableAlias = tableAlias;
 		this.select = select;
 		this.tag = "not exists";
@@ -588,12 +672,12 @@ public class Param<T> {
 		this.connect = connect;
 	}
 
-	public String getKey() {
-		return key;
+	public EntityField getField() {
+		return field;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setField(EntityField field) {
+		this.field = field;
 	}
 
 	public String getTag() {
@@ -653,12 +737,12 @@ public class Param<T> {
 			this.tableAlias = tableAlias;			
 		}
 	}
-	public String getKey2() {
-		return key2;
+	public EntityField getField2() {
+		return field2;
 	}
 	
-	public void setKey2(String key2) {
-		this.key2 = key2;
+	public void setField2(EntityField field2) {
+		this.field2 = field2;
 	}
 	
 	public String getTableAlias2() {
@@ -670,6 +754,24 @@ public class Param<T> {
 			this.tableAlias2 = tableAlias2;			
 		}
 	}
+
+	public String getSqlpart() {
+		return sqlpart;
+	}
+
+	public void setSqlpart(String sqlpart) {
+		this.sqlpart = sqlpart;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+	
+	
 	
 
 }
