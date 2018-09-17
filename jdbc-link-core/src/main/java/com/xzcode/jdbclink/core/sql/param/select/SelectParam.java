@@ -14,7 +14,7 @@ public class SelectParam{
 	
 	
 	
-	protected EntityField field = null;
+	protected String column = null;
 	
 	protected String sqlPart = null;
 	
@@ -24,7 +24,7 @@ public class SelectParam{
 	
 	protected Select<?> select;
 	
-	protected int type = 1; //参数类型，1 EntityField， 2 sqlpart
+	protected int type = 1; //参数类型，1 DEFAULT， 2 sqlpart
 	
 	/**
 	 * 参数类型常量
@@ -34,7 +34,7 @@ public class SelectParam{
 	 */
 	public static interface TypeConstant{
 		
-		int ENTITY_FIELD = 1;
+		int DEFAULT = 1;
 		
 		int SQL_PART = 2;
 	}
@@ -42,19 +42,20 @@ public class SelectParam{
 	public SelectParam() {
 	}
 
-	public SelectParam(EntityField field, String alias, Select<?> select) {
+	public SelectParam(String tableAlias,String field, String alias, Select<?> select) {
 		super();
-		this.field = field;
+		this.column = field;
 		this.alias = alias;
 		this.select = select;
+		setTableAlias(tableAlias);
 	}
 
-	public EntityField getField() {
-		return field;
+	public String getColumn() {
+		return column;
 	}
-
-	public void setField(EntityField field) {
-		this.field = field;			
+	
+	public void setColumn(String column) {
+		this.column = column;
 	}
 
 	public String getAlias() {

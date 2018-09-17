@@ -14,7 +14,7 @@ public class StringBuilderPool {
     
 	
 	public void init() {
-		 GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+		 GenericObjectPoolConfig<StringBuilder> poolConfig = new GenericObjectPoolConfig<>();
 		 
 		//池对象耗尽之后是否阻塞,maxWait<0时一直等待
 		 poolConfig.setBlockWhenExhausted(false);

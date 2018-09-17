@@ -1,6 +1,9 @@
 package com.xzcode.jdbclink.core.sql.order;
 
-public class OrderParam {
+import com.xzcode.jdbclink.core.entity.model.EntityField;
+import com.xzcode.jdbclink.core.sql.Select;
+
+public class OrderParam<T> {
 	
 	private String tableAlias = "";
 	
@@ -10,41 +13,72 @@ public class OrderParam {
 	
 	private boolean isSactisfy = true;
 	
+	private Select<T> select;
+	
 	public OrderParam() {
 	}
 	
-	
-
-	public OrderParam(String orderBy, String sortBy) {
-		super();
-		this.orderBy = orderBy;
-		this.sortBy = sortBy;
+	public OrderParam(EntityField orderBy, Select<T> select) {
+		this.select = select;
+		this.orderBy = orderBy.getFieldName();
+		this.tableAlias = orderBy.getTableAlias();
 	}
-	
-	public OrderParam(String tableAlias ,String orderBy, String sortBy) {
-		super();
-		this.orderBy = orderBy;
-		this.sortBy = sortBy;
+	public OrderParam(String tableAlias, EntityField orderBy, Select<T> select) {
+		this.select = select;
+		this.orderBy = orderBy.getFieldName();
 		this.tableAlias = tableAlias;
 	}
 	
 	
-	public OrderParam(boolean isSactisfy, String tableAlias, String orderBy, String sortBy) {
+	public OrderParam(boolean isSactisfy, EntityField orderBy, Select<T> select) {
+		this.select = select;
+		this.orderBy = orderBy.getFieldName();
+		this.tableAlias = orderBy.getTableAlias();
+		this.isSactisfy = isSactisfy;
+	}
+	
+	public OrderParam(boolean isSactisfy, String tableAlias, EntityField orderBy, Select<T> select) {
+		this.select = select;
+		this.orderBy = orderBy.getFieldName();
+		this.tableAlias = tableAlias;
+		this.isSactisfy = isSactisfy;
+	}
+
+	
+	public OrderParam(String tableAlias ,String orderBy, String sortBy, Select<T> select) {
+		super();
+		this.orderBy = orderBy;
+		this.sortBy = sortBy;
+		setTableAlias(tableAlias);
+	}
+	
+	
+	public OrderParam(boolean isSactisfy, String tableAlias, String orderBy, String sortBy, Select<T> select) {
 		super();
 		this.isSactisfy = isSactisfy;
-		this.tableAlias = tableAlias;
+		setTableAlias(tableAlias);
 		this.orderBy = orderBy;
 		this.sortBy = sortBy;
+	}
+	
+	public Select<T> asc() {
+		this.sortBy = "asc";
+		return this.select;
 	}
 
 
 
-	public String getOrderBy() {
-		return orderBy;
+	public Select<T> desc() {
+		this.sortBy = "desc";
+		return this.select;
 	}
 
 	public void setOrderBy(String orderBy) {
 		this.orderBy = orderBy;
+	}
+	
+	public String getOrderBy() {
+		return orderBy;
 	}
 
 	public String getSortBy() {
@@ -72,5 +106,9 @@ public class OrderParam {
 	
 	public void setSactisfy(boolean isSactisfy) {
 		this.isSactisfy = isSactisfy;
+	}
+	
+	public Select<?> getSelect() {
+		return select;
 	}
 }

@@ -16,7 +16,7 @@ import java.lang.Integer;
  * 产品 实体类
  * 
  * @author JdbcLinkGenerator
- * 2018-09-10 13:14:55
+ * 2018-09-15 00:26:12
  */
 @Entity
 @Table(name = Product.__TABLE_NAME__, alias = Product.__TABLE_NAME__)
@@ -26,6 +26,11 @@ public class Product implements IEntity {
 	 * 产品 表名
 	 */
 	public static final String __TABLE_NAME__ = "product";
+	
+	/**
+	 * 表示所有列
+	 */
+	public static final EntityField ALL_ = new EntityField("*", "*", Product.__TABLE_NAME__);
 
 	//列名常量
 	

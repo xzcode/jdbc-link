@@ -7,9 +7,11 @@
 <application generated-by="eclipse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.zeroturnaround.com" xsi:schemaLocation="http://www.zeroturnaround.com http://update.zeroturnaround.com/jrebel/rebel-2_1.xsd">
 
 	<classpath>
-		<dir name="D:/EE_MY/jdbc-link/jdbc-link-base/bin/main">
+		<dir name="D:/EE_MY/jdbc-link/jdbc-link-test/bin/main">
 		</dir>
-		<dir name="D:/EE_MY/jdbc-link/jdbc-link-base/bin/test">
+		<dir name="D:/EE_MY/jdbc-link/jdbc-link-test/bin/test">
+		</dir>
+		<dir name="D:/EE_MY/jdbc-link/jdbc-link-test/bin/default">
 		</dir>
 	</classpath>
 

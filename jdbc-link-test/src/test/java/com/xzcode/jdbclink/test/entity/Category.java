@@ -15,7 +15,7 @@ import java.lang.String;
  *  实体类
  * 
  * @author JdbcLinkGenerator
- * 2018-09-10 13:14:55
+ * 2018-09-15 00:26:12
  */
 @Entity
 @Table(name = Category.__TABLE_NAME__, alias = Category.__TABLE_NAME__)
@@ -25,6 +25,11 @@ public class Category implements IEntity {
 	 *  表名
 	 */
 	public static final String __TABLE_NAME__ = "category";
+	
+	/**
+	 * 表示所有列
+	 */
+	public static final EntityField ALL_ = new EntityField("*", "*", Category.__TABLE_NAME__);
 
 	//列名常量
 	

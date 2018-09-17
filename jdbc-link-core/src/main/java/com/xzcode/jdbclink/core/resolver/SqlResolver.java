@@ -63,57 +63,41 @@ public class SqlResolver implements ISqlResolver {
 		//Map<String, AliasAndPrefix> joinsMap = select.getJoins();
 		
 		if (selectParams == null) {
-			select.column("*");
+			select.column(select.getMainAlias(), "*");
 			selectParams = select.getSelectParams();
 		}
 		
 			
 		for (SelectParam sp : selectParams) {
-			/*
-			if (sp.getType() == SelectParam.TypeConstant.SQL_PART) {
+			
+			if (sp.getType() != SelectParam.TypeConstant.SQL_PART) {
+					if ("*".equals(sp.getColumn())) {
+						List<SelectParam> transferAllColumns = transferAllColumns(select, sp.getTableAlias());
+						for (SelectParam selectParam : transferAllColumns) {
+							columnsSql
+							.append(selectParam.getSqlPart())
+							.append(",");
+							;
+						}
+					}else {
+						columnsSql
+						.append(sp.getTableAlias())
+						.append('.')
+						.append(sp.getColumn())
+						.append(" ")
+						.append(sp.getAlias())
+						.append(" ")
+						.append(",");
+						;
+					}
+					
+					
+			}else {
 				columnsSql
 				.append(sp.getSqlPart())
 				.append(",");
 				;
-				continue;
-			}
-			*/
-			if (sp.getType() == SelectParam.TypeConstant.SQL_PART) {
 				
-				if (sp.getSqlPart().equals("*")) {
-					List<SelectParam> transferAllColumns = transferAllColumns(select);
-					
-					for (SelectParam sp2 : transferAllColumns) {
-						/*columnsSql
-						.append(x2.getTableAlias())
-						.append(x2.getTableAlias() == "" ? "" : '.')
-						.append(x2.getField())
-						.append(" ")
-						.append(x2.getAlias())
-						.append(" ")
-						.append(",");
-						;*/
-						columnsSql
-						.append(sp2.getSqlPart())
-						.append(",");
-						;
-					}
-				}else {
-					columnsSql
-					.append(sp.getSqlPart())
-					.append(",");
-					;
-				}
-			}else {
-				columnsSql
-				.append(sp.getTableAlias())
-				.append('.')
-				.append(sp.getField().getFieldName())
-				.append(" ")
-				.append(sp.getAlias())
-				.append(" ")
-				.append(",");
-				;
 			}
 			
 			
@@ -251,13 +235,14 @@ public class SqlResolver implements ISqlResolver {
 		}
 		
 		
+		@SuppressWarnings("rawtypes")
 		List<OrderParam> orderParams = select.getOrderParams();
 		
 		if (orderParams != null && orderParams.size() > 0) {
 			
 			sql.append(" order by ");
 			
-			for (OrderParam order : orderParams) {
+			for (@SuppressWarnings("rawtypes") OrderParam order : orderParams) {
 				sql
 				.append(order.getTableAlias())
 				.append(order.getTableAlias() == "" ? "" : ".")
@@ -687,11 +672,11 @@ public class SqlResolver implements ISqlResolver {
 	 * @author zai
 	 * 2018-05-10
 	 */
-	private  List<SelectParam> transferAllColumns(Select<?> select) {
+	private  List<SelectParam> transferAllColumns(Select<?> select, String tableAlias) {
 		SelectParam selectParam = null;
 		
 		EntityInfo entityInfo = null;
-		/*
+		
 		if (tableAlias == null || tableAlias.equals("") || tableAlias.equals(select.getMainAlias())) {
 			entityInfo = select.getEntityInfo();
 		}else if (select.getJoins() != null && select.getJoins().containsKey(tableAlias)) {
@@ -699,8 +684,8 @@ public class SqlResolver implements ISqlResolver {
 		}else {
 			throw new RuntimeException("There is no such table alias:" + tableAlias + "!");
 		}
-		 */
-		entityInfo = select.getEntityInfo();
+		
+		//entityInfo = select.getEntityInfo();
 		List<EntityFieldInfo> fieldInfos = entityInfo.getFieldInfos();
 		int fieldInfosSize = fieldInfos.size();
 		List<SelectParam> list = new ArrayList<>(fieldInfosSize);
@@ -710,7 +695,7 @@ public class SqlResolver implements ISqlResolver {
 			selectParam = new SelectParam();
 			selectParam.setType(SelectParam.TypeConstant.SQL_PART);
 			
-			selectParam.setSqlPart(select.getMainAlias() + "." + fieldInfos.get(i).getColumn() + " " + fieldInfos.get(i).getPropName());
+			selectParam.setSqlPart(tableAlias + "." + fieldInfos.get(i).getColumn() + " " + fieldInfos.get(i).getPropName());
 			
 			/*
 			selectParam.setTableAlias(tableAlias);

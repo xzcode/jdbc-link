@@ -26,8 +26,8 @@ private JdbcTemplate jdbcTemplate;
 		config.setDbUrl("jdbc:mysql://common.host:8306/jdbc-link-test?useSSL=false");
 		config.setDbUserName("root");
 		config.setDbPassword("123456");
-		config.setEntityBasicOutputPath("D:/EE_MY/jdbc-link/jdbc-link-test/src/main/java");
 		config.setEntityBasicPackage("com.xzcode.jdbclink.test.entity");
+		config.setEntityBasicOutputPath("D:/EE_MY/jdbc-link/jdbc-link-test/src/test/java" + "/" + (config.getEntityBasicPackage().replaceAll("\\.", "/")));
 		config.setCreateModulePackage(false);
 		
 		JdbcLinkGenerator generator = new JdbcLinkGenerator(config, jdbcTemplate);

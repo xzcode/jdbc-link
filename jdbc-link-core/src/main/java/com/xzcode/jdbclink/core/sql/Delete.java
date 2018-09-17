@@ -29,6 +29,7 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 	protected LimitParam limit;
 	
 	public Delete(Class<?> clazz, JdbcLinkConfig config) {
+		this.sqlResolver = config.getSqlResolver();
 		this.config = config;
 		this.entityInfo = config.getEntityInfoCache().getEntityInfo(clazz);
 		

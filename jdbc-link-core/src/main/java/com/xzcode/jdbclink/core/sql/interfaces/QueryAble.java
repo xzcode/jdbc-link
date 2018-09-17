@@ -5,12 +5,12 @@ import java.util.Map;
 
 import com.xzcode.jdbclink.core.format.KeyFormatter;
 import com.xzcode.jdbclink.core.format.ValueFormatter;
-import com.xzcode.jdbclink.core.models.JdbcLinkPager;
+import com.xzcode.jdbclink.core.models.Pager;
 
 public interface QueryAble<T> extends GetSelectAble<T>{
 	
 	
-	public default JdbcLinkPager<Map<String, Object>> pageListMap(KeyFormatter keyFormatter, ValueFormatter valueFormatter) {
+	public default Pager<Map<String, Object>> pageListMap(KeyFormatter keyFormatter, ValueFormatter valueFormatter) {
 		return this.getSelect().pageListMap(keyFormatter, valueFormatter);
 	}
 	
@@ -57,7 +57,7 @@ public interface QueryAble<T> extends GetSelectAble<T>{
 	
 
 	
-	public default JdbcLinkPager<T> pageEntity() {
+	public default Pager<T> pageEntity() {
 		return this.getSelect().pageEntity();
 	}
 
@@ -69,7 +69,7 @@ public interface QueryAble<T> extends GetSelectAble<T>{
 
 
 	
-	public default JdbcLinkPager<Map<String, Object>> pageListMap() {
+	public default Pager<Map<String, Object>> pageListMap() {
 		return this.getSelect().pageListMap();
 	}
 

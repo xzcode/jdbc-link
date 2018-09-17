@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.xzcode.jdbclink.core.JdbcLink;
-import com.xzcode.jdbclink.core.models.JdbcLinkPager;
+import com.xzcode.jdbclink.core.models.Pager;
 import com.xzcode.jdbclink.test.JdbcLinkTestApp;
 import com.xzcode.jdbclink.test.entity.Category;
 import com.xzcode.jdbclink.test.entity.Product;

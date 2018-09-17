@@ -176,8 +176,8 @@ public class JdbcLinkGenerator {
 			
 			for (TableEntityInfo tableEntityInfo : tableEntityInfos) {
 				String modulePackageName = moduleNameGenerator.generateModulePackageName(tableEntityInfo.getTableName(), null, null);
-				String packagePath = entityGeneratorConfig.getEntityBasicPackage().replaceAll("\\.", "/");
-				String entityBasicOutputPath = entityGeneratorConfig.getEntityBasicOutputPath() + "/" + packagePath;
+				//String packagePath = entityGeneratorConfig.getEntityBasicPackage().replaceAll("\\.", "/");
+				String entityBasicOutputPath = entityGeneratorConfig.getEntityBasicOutputPath();
 				if (entityGeneratorConfig.isCreateModulePackage()) {
 					entityBasicOutputPath += "/" + modulePackageName;
 				}

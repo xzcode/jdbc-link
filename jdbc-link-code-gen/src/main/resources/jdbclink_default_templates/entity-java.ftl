@@ -25,6 +25,11 @@ public class ${tableEntityInfo.entityClassName} implements IEntity {
 	 * ${tableEntityInfo.tableComment} 表名
 	 */
 	public static final String __TABLE_NAME__ = "${tableEntityInfo.tableName}";
+	
+	/**
+	 * 表示所有列
+	 */
+	public static final EntityField ALL_ = new EntityField("*", "*", ${tableEntityInfo.entityClassName}.__TABLE_NAME__);
 
 	//列名常量
 	

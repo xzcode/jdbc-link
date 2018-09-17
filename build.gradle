@@ -39,7 +39,7 @@ subprojects {
 	    }
 	    repositories {
 	        maven {
-	            url "${nexusReleaseUrl}"
+	            url version.endsWith('SNAPSHOT') ? "${nexusSnapshotsUrl}" : "${nexusReleaseUrl}"
 	            credentials {
 		            username = nexusUsername
 		            password = nexusPassword

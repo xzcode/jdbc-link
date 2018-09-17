@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.xzcode.jdbclink.core.cache.IEntityInfoCache;
+import com.xzcode.jdbclink.core.entity.EntityInfo;
 import com.xzcode.jdbclink.core.entity.IEntity;
 import com.xzcode.jdbclink.core.entity.model.EntityField;
 import com.xzcode.jdbclink.core.pool.string.StringBuilderPool;
@@ -112,12 +113,13 @@ public class JdbcLink{
 		select.setJdbcLink(this);
 		return select;
 	}
-	/*
 	public <T> T select(Object uid, Class<T> clazz) {
 		Select<T> select = new Select<>(clazz, config);
 		select.setJdbcLink(this);
-		return select.selectById(uid);
+		EntityInfo entityInfo = entityInfoCache.getEntityInfo(clazz);
+		return this.select(clazz).where().and().sqlParam(entityInfo.getPrimaryKeyFieldInfo().getColumn(), " = ", uid).queryEntity();
 	}
+	/*
 	
 	public <T> T select(String key, Object val, Class<T> clazz) {
 		Select<T> select = new Select<>(clazz, config);

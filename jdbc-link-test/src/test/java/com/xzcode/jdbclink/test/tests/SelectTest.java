@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.xzcode.jdbclink.core.JdbcLink;
-import com.xzcode.jdbclink.core.models.JdbcLinkPager;
+import com.xzcode.jdbclink.core.models.Pager;
 import com.xzcode.jdbclink.test.JdbcLinkTestApp;
 import com.xzcode.jdbclink.test.entity.Category;
 import com.xzcode.jdbclink.test.entity.Product;
@@ -52,6 +52,7 @@ public class SelectTest {
 					.on().eq(Category.UID, "p", Product.CATEGORY_ID)
 				.where()
 					.and().eq("p", Product.UID, 77l)
+				.orderBy("p", Product.UID).asc()
 				.queryListMap();
 		
 		for (Map<String, Object> map : list) {
@@ -63,7 +64,7 @@ public class SelectTest {
 	@Test
 	public void test03() throws SQLException {
 		
-		JdbcLinkPager<Map<String, Object>> pager = jdbcLink.select(Product.class)
+		Pager<Map<String, Object>> pager = jdbcLink.select(Product.class)
 		.column(Product.NAME, "productName")
 		.column(Product.CATEGORY_ID)
 		.column(Category.CATEGORY_NAME)
@@ -73,6 +74,9 @@ public class SelectTest {
 			.on().eq(Category.UID, Product.CATEGORY_ID)
 		.where()
 			.and().sqlParam(Product.UID, " = ",77l)
+			.and().eq(Product.UID, 77l)
+		.orderBy(Product.UID).asc()
+		.orderBy(Product.CREATE_DATE).desc()
 		.limit(1, 10)
 		.pageListMap();
 
@@ -89,6 +93,28 @@ public class SelectTest {
 
 		System.out.println(gson.toJson(product));
 		System.out.println(gson.toJson(list));
+		
+	}
+	
+	@Test
+	public void test05() throws SQLException {
+		
+		Pager<Map<String, Object>> pager = jdbcLink.select(Product.class, "p")
+		.column("p", Product.ALL_)
+		.column(Category.ALL_)
+		//.column(Category.CATEGORY_NAME)
+		//.columnSql("concat(",Product.NAME, ",", Category.CATEGORY_NAME, ") ccc")
+		
+		.leftJoin(Category.class)
+			.on().eq(Category.UID, "p", Product.CATEGORY_ID)
+		.where()
+			.and().eq("p", Product.UID, 77l)
+		.orderBy("p", Product.UID).asc()
+		.orderBy("p", Product.CREATE_DATE).desc()
+		.limit(1, 10)
+		.pageListMap();
+
+		System.out.println(gson.toJson(pager));
 		
 	}
 

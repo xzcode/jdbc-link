@@ -2,7 +2,7 @@ package com.xzcode.jdbclink.core.models;
 
 import java.util.List;
 
-public class JdbcLinkPager<T> {
+public class Pager<T> {
 	
 	private Integer total = 0;//总记录数
 	private Integer pages = 0;//总页数
