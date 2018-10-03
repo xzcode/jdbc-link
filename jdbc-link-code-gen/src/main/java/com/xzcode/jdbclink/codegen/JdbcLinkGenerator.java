@@ -166,7 +166,7 @@ public class JdbcLinkGenerator {
 	 * @author zai
 	 * 2018-04-16
 	 */
-	public void generateEntities() {
+	public void generateEntities(boolean coverOldFiles) {
 		
 		try {
 			
@@ -187,7 +187,9 @@ public class JdbcLinkGenerator {
 				}
 				String outFilePath = entityBasicOutputPath + "/" + tableEntityInfo.getEntityClassName() + ".java";
 				File outFile = new File(outFilePath);
-				if (outFile.exists()) {
+				
+				//覆盖或跳过
+				if (outFile.exists() && !coverOldFiles) {
 					looger.info("\nEntity java file ({}) exists,\npath:{} ,\nskip...", tableEntityInfo.getEntityClassName(), outFilePath);
 					continue;
 				}
@@ -199,11 +201,20 @@ public class JdbcLinkGenerator {
 					template.process(dataModel, writer);
 				}
 			}
-			
-			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} 
+	}
+	
+	/**
+	 * 生成但不覆盖旧文件
+	 * 
+	 * 
+	 * @author zai
+	 * 2018-09-27 15:35:59
+	 */
+	public void generateEntities() {
+		generateEntities(false);
 	}
 	
 	/**
@@ -234,6 +245,32 @@ public class JdbcLinkGenerator {
 	 * 
 	 * @author zai
 	 * 2018-04-19
+	 */
+	public void generateTableInfosExtra(
+			String templatePath, 
+			Class<?> templateLoaderClass,
+			List<ExtraTemplateInfo> templateInfos, 
+			Map<String, Object> extraData,
+			boolean coverOldFiles
+			) {
+		JdbcLinkExtraGeneratorConfig generatorConfig = getDefaultJdbcLinkExtraGeneratorConfig();
+		generatorConfig.setTemplatePath(templatePath);
+		generatorConfig.setTemplateLoaderClass(templateLoaderClass);
+		generatorConfig.setTemplateInfos(templateInfos);
+		generatorConfig.setExtraData(extraData);
+		generatorConfig.setCoverOldFiles(coverOldFiles);
+		generateTableInfosExtra(generatorConfig);
+	}
+	
+	/**
+	 * 根据表信息和自定义模版生成文件(不覆盖旧文件)
+	 * @param templatePath
+	 * @param templateLoaderClass
+	 * @param templateInfos
+	 * @param extraData
+	 * 
+	 * @author zai
+	 * 2018-09-27 20:46:32
 	 */
 	public void generateTableInfosExtra(
 			String templatePath, 
@@ -343,7 +380,8 @@ public class JdbcLinkGenerator {
 			String template,
 			Class<?> templateLoaderClass,
 			String outputFilename,
-			Map<String, Object> data
+			Map<String, Object> data,
+			boolean coverOldFiles
 			) {
 			
 			File outDir = new File(basicOutputPath);
@@ -352,7 +390,7 @@ public class JdbcLinkGenerator {
 			String outFilePath = basicOutputPath + "/" + outputFilename;
 			
 			File outFile = new File(outFilePath);
-			if (outFile.exists()) {
+			if (outFile.exists() && !coverOldFiles) {
 				looger.info("\nGenerating file ({}) exists,\npath:{} ,\nskip...", outputFilename, outFilePath);
 				return;
 			}
@@ -365,8 +403,32 @@ public class JdbcLinkGenerator {
 			}catch (Exception e) {
 				throw new RuntimeException(e);
 			}
+			
+			
 		
 	}
 	
+	/**
+	 * 自定数据和模版进行文件生成(不覆盖旧文件)
+	 * @param basicOutputPath
+	 * @param templatePath
+	 * @param template
+	 * @param templateLoaderClass
+	 * @param outputFilename
+	 * @param data
+	 * 
+	 * @author zai
+	 * 2018-09-28 10:10:42
+	 */
+	public void generateCustom(
+			String basicOutputPath, 
+			String templatePath, 
+			String template,
+			Class<?> templateLoaderClass,
+			String outputFilename,
+			Map<String, Object> data
+			) {
+		generateCustom(basicOutputPath, templatePath, template, templateLoaderClass, outputFilename, data, false);
+	}
 
 }

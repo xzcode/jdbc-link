@@ -56,7 +56,7 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 		.append(" delete from ")
 		.append(entityInfo.getTable())
 		.append(" where ")
-		.append(field.getFieldName())
+		.append(field.fieldName())
 		.append(" = ? ");
 		
 		;

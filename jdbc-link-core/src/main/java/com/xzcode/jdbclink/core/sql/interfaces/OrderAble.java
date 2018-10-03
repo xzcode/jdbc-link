@@ -9,18 +9,18 @@ public interface OrderAble<T> extends GetSelectAble<T>{
 	
 	
 	public default OrderParam<T> orderBy(EntityField orderBy) {
-		return this.orderBy(true, orderBy.getTableAlias(), orderBy);
+		return this.orderBy(true, orderBy.tableAlias(), orderBy);
 	}
 	
 	public default Select<T> orderByAsc(String tableAlias, EntityField orderBy) {
 		return this.orderBy(true, tableAlias, orderBy).asc();
 	}
 	public default Select<T> orderByAsc(EntityField orderBy) {
-		return this.orderBy(true, orderBy.getTableAlias(), orderBy).asc();
+		return this.orderBy(true, orderBy.tableAlias(), orderBy).asc();
 	}
 	
 	public default Select<T> orderByDesc(EntityField orderBy) {
-		return this.orderBy(true, orderBy.getTableAlias(), orderBy).desc();
+		return this.orderBy(true, orderBy.tableAlias(), orderBy).desc();
 	}
 	
 	public default Select<T> orderByDesc(String tableAlias, EntityField orderBy) {
@@ -33,7 +33,7 @@ public interface OrderAble<T> extends GetSelectAble<T>{
 	
 	
 	public default OrderParam<T> orderBy(boolean isSactisfy, EntityField orderBy) {
-		return this.orderBy(isSactisfy, orderBy.getTableAlias() ,orderBy);
+		return this.orderBy(isSactisfy, orderBy.tableAlias() ,orderBy);
 	}
 	
 	

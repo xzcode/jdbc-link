@@ -11,7 +11,7 @@ public class ParamUtil {
 		return Arrays.asList(sqlPart).stream()
 		.map(obj -> {
 			if (obj instanceof EntityField) {
-				return ((EntityField)obj).getTableAlias() +"."+((EntityField)obj).getFieldName();
+				return ((EntityField)obj).tableAlias() +"."+((EntityField)obj).fieldName();
 			}
 			return String.valueOf(obj);
 		})

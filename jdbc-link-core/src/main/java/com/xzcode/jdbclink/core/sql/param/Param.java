@@ -102,7 +102,7 @@ public class Param<T> {
 			this.field = field;
 			this.val = value;
 			this.tag = "=";
-			this.tableAlias = field.getTableAlias();
+			this.tableAlias = field.tableAlias();
 			return this.t;
 	}
 	
@@ -110,8 +110,8 @@ public class Param<T> {
 		this.field = field;
 		this.field2 = field2;
 		this.tag = "=";
-		this.tableAlias = field.getTableAlias();
-		this.tableAlias2 = field2.getTableAlias();
+		this.tableAlias = field.tableAlias();
+		this.tableAlias2 = field2.tableAlias();
 		return this.t;
 	}
 	
@@ -119,8 +119,8 @@ public class Param<T> {
 		this.field = field;
 		this.field2 = field2;
 		this.tag = "=";
-		this.tableAlias = field.getTableAlias();
-		this.tableAlias2 = field2.getTableAlias();
+		this.tableAlias = field.tableAlias();
+		this.tableAlias2 = field2.tableAlias();
 		return this.t;
 	}
 	
@@ -143,7 +143,7 @@ public class Param<T> {
 	}
 	
 	public T eq(EntityField field, String tableAlias2, EntityField field2) {
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		this.field = field;
 		this.tableAlias2 = tableAlias2;
 		this.field2 = field2;
@@ -154,7 +154,7 @@ public class Param<T> {
 	public T eq(String tableAlias, EntityField field, EntityField field2) {
 		this.tableAlias = tableAlias;
 		this.field = field;
-		this.tableAlias2 = field2.getTableAlias();
+		this.tableAlias2 = field2.tableAlias();
 		this.field2 = field2;
 		this.tag = "=";
 		return this.t;
@@ -165,7 +165,7 @@ public class Param<T> {
 		this.field = field;
 		this.select = select;
 		this.tag = "=";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -190,7 +190,7 @@ public class Param<T> {
 			this.field = field;
 			this.val = value;
 			this.tag = "<";
-			this.tableAlias = field.getTableAlias();
+			this.tableAlias = field.tableAlias();
 			return this.t;
 	}
 	
@@ -198,8 +198,8 @@ public class Param<T> {
 		this.field = field;
 		this.field2 = field2;
 		this.tag = "<";
-		this.tableAlias = field.getTableAlias();
-		this.tableAlias2 = field2.getTableAlias();
+		this.tableAlias = field.tableAlias();
+		this.tableAlias2 = field2.tableAlias();
 		return this.t;
 }
 	
@@ -224,7 +224,7 @@ public class Param<T> {
 		this.field = field;
 		this.select = select;
 		this.tag = "<";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -249,7 +249,7 @@ public class Param<T> {
 			this.field = field;
 			this.val = value;
 			this.tag = ">";
-			this.tableAlias = field.getTableAlias();
+			this.tableAlias = field.tableAlias();
 			return this.t;
 	}
 	
@@ -257,8 +257,8 @@ public class Param<T> {
 		this.field = field;
 		this.field2 = field2;
 		this.tag = ">";
-		this.tableAlias = field.getTableAlias();
-		this.tableAlias2 = field2.getTableAlias();
+		this.tableAlias = field.tableAlias();
+		this.tableAlias2 = field2.tableAlias();
 		return this.t;
 	}
 	
@@ -283,7 +283,7 @@ public class Param<T> {
 		this.field = field;
 		this.select = select;
 		this.tag = ">";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -300,7 +300,7 @@ public class Param<T> {
 			this.field = field;
 			this.val = value;
 			this.tag = ">=";
-			this.tableAlias = field.getTableAlias();
+			this.tableAlias = field.tableAlias();
 			return this.t;
 	}
 	
@@ -308,8 +308,8 @@ public class Param<T> {
 		this.field = field;
 		this.field2 = field2;
 		this.tag = ">=";
-		this.tableAlias = field.getTableAlias();
-		this.tableAlias2 = field2.getTableAlias();
+		this.tableAlias = field.tableAlias();
+		this.tableAlias2 = field2.tableAlias();
 		return this.t;
 	}
 	
@@ -358,7 +358,7 @@ public class Param<T> {
 			this.field = field;
 			this.val = value;
 			this.tag = "<=";
-			this.tableAlias = field.getTableAlias();
+			this.tableAlias = field.tableAlias();
 			return this.t;
 	}
 	
@@ -366,8 +366,8 @@ public class Param<T> {
 		this.field = field;
 		this.field2 = field2;
 		this.tag = "<=";
-		this.tableAlias = field.getTableAlias();
-		this.tableAlias2 = field2.getTableAlias();
+		this.tableAlias = field.tableAlias();
+		this.tableAlias2 = field2.tableAlias();
 		return this.t;
 	}
 	
@@ -417,7 +417,7 @@ public class Param<T> {
 		this.field = field;
 		this.val = value;
 		this.tag = "like";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -434,7 +434,7 @@ public class Param<T> {
 		this.field = field;
 		this.select = select;
 		this.tag = "like";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -459,7 +459,7 @@ public class Param<T> {
 		this.field = field;
 		this.val = "%" + value + "%";
 		this.tag = "like";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -483,7 +483,7 @@ public class Param<T> {
 		//this.val = "locate('" + value +"', "+ key +") > 0";
 		this.val = value;
 		this.tag = "locate";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -512,7 +512,7 @@ public class Param<T> {
 		this.tag = "between";
 		this.val = betweenFrom;
 		this.val2 = betweenTo;
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -537,7 +537,7 @@ public class Param<T> {
 		//this.val = "(" + StringUtils.join(values, ",") + ")";
 		this.values = values;
 		this.tag = "in";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -561,7 +561,7 @@ public class Param<T> {
 		this.field = field;
 		this.select = select;
 		this.tag = "in";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -585,7 +585,7 @@ public class Param<T> {
 		//this.val = "('" + StringUtils.join(values, "','") +"')";
 		this.values = values;
 		this.tag = "not in";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -608,7 +608,7 @@ public class Param<T> {
 		this.field = field;
 		this.select = select;
 		this.tag = "not in";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -624,7 +624,7 @@ public class Param<T> {
 	public T exists(EntityField field, Select<T> select) {
 		this.select = select;
 		this.tag = "exists";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	
@@ -638,7 +638,7 @@ public class Param<T> {
 	public T notExists(EntityField field, Select<T> select) {
 		this.select = select;
 		this.tag = "not exists";
-		this.tableAlias = field.getTableAlias();
+		this.tableAlias = field.tableAlias();
 		return this.t;
 	}
 	

@@ -56,7 +56,7 @@ public class UpdateSet implements ExecuteAble,WhereAble<UpdateSet, UpdateSet>{
 	
 	public UpdateSet paramIncrease(EntityField field, Object value){
 		UpdateParam updateParam = new UpdateParam(this);
-		updateParam.sqlParam(field.getFieldName(), " = ", field.getFieldName() + "+" + value);
+		updateParam.sqlParam(field.fieldName(), " = ", field.fieldName() + "+" + value);
 		this.addParam(updateParam);
 		return this;
 	}

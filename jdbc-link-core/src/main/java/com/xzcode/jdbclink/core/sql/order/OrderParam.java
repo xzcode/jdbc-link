@@ -20,26 +20,26 @@ public class OrderParam<T> {
 	
 	public OrderParam(EntityField orderBy, Select<T> select) {
 		this.select = select;
-		this.orderBy = orderBy.getFieldName();
-		this.tableAlias = orderBy.getTableAlias();
+		this.orderBy = orderBy.fieldName();
+		this.tableAlias = orderBy.tableAlias();
 	}
 	public OrderParam(String tableAlias, EntityField orderBy, Select<T> select) {
 		this.select = select;
-		this.orderBy = orderBy.getFieldName();
+		this.orderBy = orderBy.fieldName();
 		this.tableAlias = tableAlias;
 	}
 	
 	
 	public OrderParam(boolean isSactisfy, EntityField orderBy, Select<T> select) {
 		this.select = select;
-		this.orderBy = orderBy.getFieldName();
-		this.tableAlias = orderBy.getTableAlias();
+		this.orderBy = orderBy.fieldName();
+		this.tableAlias = orderBy.tableAlias();
 		this.isSactisfy = isSactisfy;
 	}
 	
 	public OrderParam(boolean isSactisfy, String tableAlias, EntityField orderBy, Select<T> select) {
 		this.select = select;
-		this.orderBy = orderBy.getFieldName();
+		this.orderBy = orderBy.fieldName();
 		this.tableAlias = tableAlias;
 		this.isSactisfy = isSactisfy;
 	}

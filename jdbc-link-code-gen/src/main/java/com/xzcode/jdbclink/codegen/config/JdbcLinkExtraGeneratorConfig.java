@@ -38,22 +38,19 @@ public class JdbcLinkExtraGeneratorConfig{
 	 */
 	Map<String, Object> extraData;
 	
+	/** 覆盖旧文件 */
+	private boolean coverOldFiles;
+	
 	
 	public JdbcLinkExtraGeneratorConfig() {
 	}
 	
 	
 
-	public JdbcLinkExtraGeneratorConfig(
-			String dbUrl, 
-			String dbUserName, 
-			String dbPassword, 
-			String databaseName,
-			String templatePath, 
-			Class<?> templateLoaderClass,
-			List<ExtraTemplateInfo> templateInfos, 
-			Map<String, Object> extraData
-			) {
+
+	public JdbcLinkExtraGeneratorConfig(String dbUrl, String dbUserName, String dbPassword, String databaseName,
+			String templatePath, Class<?> templateLoaderClass, List<ExtraTemplateInfo> templateInfos,
+			Map<String, Object> extraData, boolean coverOldFiles) {
 		super();
 		this.dbUrl = dbUrl;
 		this.dbUserName = dbUserName;
@@ -63,7 +60,10 @@ public class JdbcLinkExtraGeneratorConfig{
 		this.templateLoaderClass = templateLoaderClass;
 		this.templateInfos = templateInfos;
 		this.extraData = extraData;
+		this.coverOldFiles = coverOldFiles;
 	}
+
+
 
 	public String getDbUrl() {
 		return dbUrl;
@@ -127,5 +127,13 @@ public class JdbcLinkExtraGeneratorConfig{
 	
 	public Map<String, Object> getExtraData() {
 		return extraData;
+	}
+	
+	public boolean isCoverOldFiles() {
+		return coverOldFiles;
+	}
+	
+	public void setCoverOldFiles(boolean coverOldFiles) {
+		this.coverOldFiles = coverOldFiles;
 	}
 }

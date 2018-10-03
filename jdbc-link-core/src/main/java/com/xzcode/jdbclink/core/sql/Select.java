@@ -119,12 +119,12 @@ public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T
 
 	public Select<T> column(String tableAlias, EntityField field, String alias) {
 
-		column(tableAlias, field.getFieldName(), alias);
+		column(tableAlias, field.fieldName(), alias);
 		return this;
 	}
 
 	public Select<T> column(EntityField field, String alias) {
-		return this.column(field.getTableAlias(), field, alias);
+		return this.column(field.tableAlias(), field, alias);
 	}
 
 	public Select<T> column(String tableAlias, EntityField field) {
@@ -132,7 +132,7 @@ public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T
 	}
 
 	public Select<T> column(EntityField field) {
-		return this.column(field.getTableAlias(), field, null);
+		return this.column(field.tableAlias(), field, null);
 	}
 
 	public Select<T> column(String sqlPart) {
@@ -175,15 +175,15 @@ public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T
 	 * return this; }
 	 */
 	public Select<T> count(String tableAlias, EntityField field, String alias) {
-		return this.column("count(" + tableAlias + "." + field.getFieldName() + ") " + alias);
+		return this.column("count(" + tableAlias + "." + field.fieldName() + ") " + alias);
 	}
 
 	public Select<T> count(EntityField field, String alias) {
-		return this.column("count(" + field.getTableAlias() + "." + field.getFieldName() + ") " + alias);
+		return this.column("count(" + field.tableAlias() + "." + field.fieldName() + ") " + alias);
 	}
 
 	public Select<T> count(EntityField field) {
-		return this.column("count(" + field.getTableAlias() + "." + field.getFieldName() + ") ");
+		return this.column("count(" + field.tableAlias() + "." + field.fieldName() + ") ");
 	}
 
 	public Select<T> countAll(String alias) {

@@ -88,7 +88,7 @@ public class Update implements ExecuteAble{
 				}else {
 					if (nullableFields != null && nullableFields.length > 0) {
 						for (EntityField nullCol : nullableFields) {
-							if (fieldInfos.get(i).getColumn().equals(nullCol.getFieldName())) {
+							if (fieldInfos.get(i).getColumn().equals(nullCol.fieldName())) {
 								args.add(null);
 								sql.append(fieldInfos.get(i).getColumn()).append("=?,");
 							}

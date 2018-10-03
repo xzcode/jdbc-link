@@ -31,26 +31,26 @@ public class EntityField {
 
 
 
-	public String getFieldName() {
+	public String fieldName() {
 		return fieldName;
 	}
 
 
 
 
-	public String getPropName() {
+	public String propName() {
 		return propName;
 	}
 
 
 
 
-	public String getTableAlias() {
+	public String tableAlias() {
 		return tableAlias;
 	}
 
 
-	public String getTableName() {
+	public String tableName() {
 		return tableName;
 	}
 	

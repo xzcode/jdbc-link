@@ -307,13 +307,13 @@ public class SqlResolver implements ISqlResolver {
 					
 					if (updateParam.getField2() != null) {
 						sql
-						.append(updateParam.getField().getFieldName())
+						.append(updateParam.getField().fieldName())
 						.append(" = ")
-						.append(updateParam.getField2().getFieldName())
+						.append(updateParam.getField2().fieldName())
 						.append(",");
 					}else {
 						sql
-						.append(updateParam.getField().getFieldName())
+						.append(updateParam.getField().fieldName())
 						.append(" = ? ,");
 						args.add(updateParam.getVal());
 					}
@@ -575,7 +575,7 @@ public class SqlResolver implements ISqlResolver {
 					.append(" ")
 					.append(param.getTableAlias())
 					.append(".")
-					.append(param.getField().getFieldName())
+					.append(param.getField().fieldName())
 					.append(" ")
 					.append(param.getTag())
 					.append(" ? and ? ")
@@ -598,7 +598,7 @@ public class SqlResolver implements ISqlResolver {
 						.append(" ")
 						.append(param.getTableAlias())
 						.append(".")
-						.append(param.getField().getFieldName())
+						.append(param.getField().fieldName())
 						.append(" ")
 						.append(param.getTag())
 						.append(" (");
@@ -627,7 +627,7 @@ public class SqlResolver implements ISqlResolver {
 					.append(" locate( ?, ")
 					.append(param.getTableAlias())
 					.append(".")
-					.append(param.getField().getFieldName())
+					.append(param.getField().fieldName())
 					.append(") > 0 ")
 					;
 					args.add(param.getVal());
@@ -644,7 +644,7 @@ public class SqlResolver implements ISqlResolver {
 					.append(" ")
 					.append(param.getTableAlias())
 					.append(".")
-					.append(param.getField().getFieldName())
+					.append(param.getField().fieldName())
 					.append(" ")
 					.append(param.getTag())
 					.append(" ");
@@ -652,7 +652,7 @@ public class SqlResolver implements ISqlResolver {
 						sql
 						.append(param.getTableAlias2())
 						.append(".")
-						.append(param.getField2().getFieldName())
+						.append(param.getField2().fieldName())
 						.append(" ");
 					}else{
 						sql.append(" ? ");
