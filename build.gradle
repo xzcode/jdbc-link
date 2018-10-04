@@ -6,9 +6,14 @@ subprojects {
 	group = "${group}"
 	version = "${version}"
 	
+	
+	
+	def profile = System.getProperty("profile")
+	System.out.println( profile)
+	
 	repositories {
 
-		maven {url "${nexusPublicUrl}"}
+		maven {url profile.equals('test') ? "${testNexusPublicUrl}" : "${nexusPublicUrl}"}
 		mavenLocal()
 	}
 	

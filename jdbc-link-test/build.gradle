@@ -1,3 +1,6 @@
+
+test.enabled = false
+
 buildscript {
 		repositories {
 			maven {url "${nexusPublicUrl}"}
