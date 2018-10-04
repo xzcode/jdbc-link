@@ -1,10 +1,10 @@
 
 test.enabled = false
-publishToMavenLocal.enabled = false
 
+	
 buildscript {
 		repositories {
-			maven {url "${nexusPublicUrl}"}
+			maven {url 'test'.equals(System.getProperty("profile")) ? "${testNexusPublicUrl}" : "${nexusPublicUrl}"}
 			mavenLocal()
 		}
 		dependencies {
