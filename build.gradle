@@ -9,7 +9,7 @@ subprojects {
 	
 	
 	def profile = System.getProperty("profile")
-	System.out.println( profile)
+	System.out.println( profile +',' +profile.equals('test') ? "${testNexusPublicUrl}" : "${nexusPublicUrl}")
 	
 	repositories {
 

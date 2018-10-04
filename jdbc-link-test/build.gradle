@@ -1,5 +1,6 @@
 
 test.enabled = false
+publishToMavenLocal.enabled = false
 
 buildscript {
 		repositories {
