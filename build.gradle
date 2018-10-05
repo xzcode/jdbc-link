@@ -8,11 +8,9 @@ subprojects {
 	
 	
 	
-	def profileNexusPublicUrl = 'test'.equals(System.getProperty("profile")) ? "${testNexusPublicUrl}" : "${nexusPublicUrl}"
-	
 	repositories {
 
-		maven {url profileNexusPublicUrl}
+		maven {url 'test'.equals(System.getProperty("profile")) ? "${testNexusPublicUrl}" : "${nexusPublicUrl}"}
 		mavenLocal()
 	}
 	
