@@ -119,14 +119,13 @@ public class JdbcLink{
 		EntityInfo entityInfo = entityInfoCache.getEntityInfo(clazz);
 		return this.select(clazz).where().and().sqlParam(entityInfo.getPrimaryKeyFieldInfo().getColumn(), " = ", uid).queryEntity();
 	}
-	/*
 	
-	public <T> T select(String key, Object val, Class<T> clazz) {
+	public <T> T select(EntityField field, Object val, Class<T> clazz) {
 		Select<T> select = new Select<>(clazz, config);
 		select.setJdbcLink(this);
-		return select.selectByKey(key, val);
+		return select.byField(field, val);
 	}
-	*/
+	
 	public List<Map<String, Object>> select(String sql) {
 		return this.jdbcTemplate.queryForList(sql);
 	}
