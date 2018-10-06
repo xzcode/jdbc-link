@@ -1,5 +1,7 @@
 package com.xzcode.jdbclink.core.entity;
 
-public interface IEntity {
+import java.io.Serializable;
 
+public interface IEntity extends Serializable{
+	
 }

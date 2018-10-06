@@ -20,6 +20,8 @@ import ${imp};
 @Entity
 @Table(name = ${tableEntityInfo.entityClassName}.__TABLE_NAME__, alias = ${tableEntityInfo.entityClassName}.__TABLE_NAME__)
 public class ${tableEntityInfo.entityClassName} implements IEntity {
+	
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * ${tableEntityInfo.tableComment} 表名
