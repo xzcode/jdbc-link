@@ -11,6 +11,14 @@ public interface JoinAble<T, C> {
 	
 	JdbcLinkConfig getConfig();
 	
+	public default Join<T, C> join(Class<?> clazz) {
+		EntityInfo entityInfo = getConfig().getEntityInfoCache().getEntityInfo(clazz);
+		Join<T, C> join = new Join<>(getConfig(), entityInfo, this, getAlias(null, entityInfo));
+		this.addJoins(getAlias(null, entityInfo), join);
+		join.setJoinTag( "inner join");
+		return join;
+	}
+	
 	public default Join<T, C> join(Class<?> clazz, String alias) {
 		EntityInfo entityInfo = getConfig().getEntityInfoCache().getEntityInfo(clazz);
 		Join<T, C> join = new Join<>(getConfig(), entityInfo, this, alias);
@@ -49,6 +57,14 @@ public interface JoinAble<T, C> {
 		Join<T, C> join = new Join<T, C>(getConfig(), entityInfo,this, alias, prefix);
 		join.setJoinTag( "left join");
 		this.addJoins(getAlias(alias, entityInfo), join);
+		return join;
+	}
+	
+	public default Join<T, C> rightJoin(Class<?> clazz) {
+		EntityInfo entityInfo = getConfig().getEntityInfoCache().getEntityInfo(clazz);
+		Join<T, C> join = new Join<T, C>(getConfig(), entityInfo,this, getAlias(null, entityInfo));
+		join.setJoinTag( "right join");
+		this.addJoins(getAlias(null, entityInfo), join);
 		return join;
 	}
 	

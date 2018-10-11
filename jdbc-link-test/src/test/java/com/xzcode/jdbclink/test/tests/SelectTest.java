@@ -105,7 +105,7 @@ public class SelectTest {
 		//.column(Category.CATEGORY_NAME)
 		//.columnSql("concat(",Product.NAME, ",", Category.CATEGORY_NAME, ") ccc")
 		
-		.leftJoin(Category.class)
+		.join(Category.class)
 			.on().eq(Category.UID, "p", Product.CATEGORY_ID)
 		.where()
 			.and().eq("p", Product.UID, 77l)
