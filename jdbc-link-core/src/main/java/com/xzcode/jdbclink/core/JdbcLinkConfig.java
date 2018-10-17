@@ -2,14 +2,16 @@ package com.xzcode.jdbclink.core;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.xzcode.jdbclink.core.annotations.Entity;
 import com.xzcode.jdbclink.core.cache.DefaultEntityInfoCache;
 import com.xzcode.jdbclink.core.cache.IEntityInfoCache;
 import com.xzcode.jdbclink.core.pool.string.StringBuilderPool;
 import com.xzcode.jdbclink.core.resolver.ISqlResolver;
 import com.xzcode.jdbclink.core.resolver.SqlResolver;
 
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 
 
 public class JdbcLinkConfig{
@@ -58,11 +60,19 @@ public class JdbcLinkConfig{
 		
 		//扫描实体类
 		if (entityPackages != null && entityPackages.length > 0) {
-			new FastClasspathScanner(entityPackages)  
-		    .matchClassesWithAnnotation(Entity.class, clazz -> {
-		    	this.entityInfoCache.addEntityInfo(clazz);
-		    })
-		    .scan();
+			ScanResult scanResult = new ClassGraph()
+			//.verbose()                   // Log to stderr
+            .enableAllInfo()             // Scan classes, methods, fields, annotations
+            .whitelistPackages(entityPackages)
+            .scan()
+            ;
+			ClassInfoList classInfoList = scanResult.getClassesWithAnnotation("com.xzcode.jdbclink.core.annotations.Entity");
+			for (ClassInfo classInfo : classInfoList) {
+				
+				this.entityInfoCache.addEntityInfo(classInfo.loadClass());
+				
+			}
+			
 		}
 		
 	}
