@@ -103,10 +103,14 @@ public class UpdateParam{
 		this.field2 = field2;
 	}
 	
-
+	public int getType() {
+		return type;
+	}
 	
 
-	
+	public String getSqlpart() {
+		return sqlpart;
+	}
 	
 	
 	

@@ -305,19 +305,26 @@ public class SqlResolver implements ISqlResolver {
 			for (UpdateParam updateParam : updateParams) {
 				if (updateParam.getIsSatisfy()) {
 					
-					if (updateParam.getField2() != null) {
-						sql
-						.append(updateParam.getField().fieldName())
-						.append(" = ")
-						.append(updateParam.getField2().fieldName())
-						.append(",");
-					}else {
-						sql
-						.append(updateParam.getField().fieldName())
-						.append(" = ? ,");
+					//如果是字段类型
+					if(updateParam.getType() == UpdateParam.TypeConstant.ENTITY_FIELD) {
+					
+						if (updateParam.getField2() != null) {
+							sql
+							.append(updateParam.getField().fieldName())
+							.append(" = ")
+							.append(updateParam.getField2().fieldName())
+							.append(",");
+						}else {
+							sql
+							.append(updateParam.getField().fieldName())
+							.append(" = ? ,");
+							args.add(updateParam.getVal());
+						}
+					
+					}else if (updateParam.getType() == UpdateParam.TypeConstant.SQL_PART) {
+						sql.append(updateParam.getSqlpart());
 						args.add(updateParam.getVal());
 					}
-					
 					
 				}
 			}
