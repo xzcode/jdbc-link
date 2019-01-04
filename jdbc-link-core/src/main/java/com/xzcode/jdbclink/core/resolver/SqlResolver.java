@@ -320,15 +320,16 @@ public class SqlResolver implements ISqlResolver {
 							.append(" = ? ,");
 							args.add(updateParam.getVal());
 						}
+						
+						sql.setLength(sql.length() - 1);
 					
 					}else if (updateParam.getType() == UpdateParam.TypeConstant.SQL_PART) {
 						sql.append(updateParam.getSqlpart());
-						args.add(updateParam.getVal());
 					}
 					
 				}
 			}
-			sql.setLength(sql.length() - 1);
+			
 			
 			Where<UpdateSet, UpdateSet> where = update.getSet().getWhere();
 			

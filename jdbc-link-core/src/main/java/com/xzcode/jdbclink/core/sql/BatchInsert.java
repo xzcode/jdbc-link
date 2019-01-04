@@ -96,7 +96,7 @@ public class BatchInsert {
 						Field field = null;
 						for (IEntity rec : entities) {
 							for (int i = 1; i <= fieldInfosSize; i++) {
-								field = fieldInfos.get(i).getField();
+								field = fieldInfos.get(i - 1).getField();
 									prepareStatement.setObject(i, field.get(rec));
 								
 								field.setAccessible(true);
@@ -110,7 +110,7 @@ public class BatchInsert {
 							for (IEntity rec : entities) {
 								sb.append("[");
 								for (int i = 1; i <= fieldInfosSize; i++) {
-									field = fieldInfos.get(i).getField();
+									field = fieldInfos.get(i - 1).getField();
 									sb.append(field.get(rec)).append(",");
 								}
 								sb.setLength(sb.length() - 1);
