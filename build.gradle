@@ -1,7 +1,7 @@
 
 subprojects {
 	apply plugin: 'java'
-	apply plugin: 'maven-publish'
+	
 	
 	group = "${group}"
 	version = "${version}"
@@ -31,35 +31,7 @@ subprojects {
 		from sourceSets.main.allJava
 	}
 	
-	publishing {
-	    publications {
-	        mavenJava(MavenPublication) {
-	            from components.java
-		    artifact sourceJar {
-			classifier "sources"
-		    }
-	        }
-	    }
-	    repositories {
-		    if('test'.equals(profile)){
-	        	maven {
-		            url version.endsWith('SNAPSHOT') ? "${testNexusSnapshotsUrl}" : "${testNexusReleaseUrl}"
-		            credentials {
-			            username = System.getProperty("nexusUsername")
-			            password = System.getProperty("nexusPassword")
-			        }
-		        }
-	        }else {
-		        maven {
-		            url version.endsWith('SNAPSHOT') ? "${nexusSnapshotsUrl}" : "${nexusReleaseUrl}"
-		            credentials {
-			            username = nexusUsername
-			            password = nexusPassword
-			        }
-		        }
-	        }
-	    }
-	}
+	
 }
 
 
