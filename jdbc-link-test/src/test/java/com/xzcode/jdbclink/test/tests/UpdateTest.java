@@ -33,7 +33,7 @@ public class UpdateTest {
 		//List<Map<String, Object>> list = jdbcLink.select(Product.class).queryListMap();
 		jdbcLink.update(Product.class)
 			.set()
-				.param(Product.NAME, "xxxxx")
+				.param(Product.NAME, "xxxxx").param(Product.NAME, "xxxxx")
 			.where()
 				.and().eq(Product.UID, 77L)
 			.execute();
