@@ -85,21 +85,10 @@ public class JdbcLink{
 	}
 	
 	
-	public int batchInsert(List<IEntity> entities) {
+	public void batchInsert(List<IEntity> entities) {
 		BatchInsert insert = new BatchInsert(config);
-		return insert.batchInsert(entities, false);
+		insert.batchInsert(entities, false);
 	}
-	
-	public int batchInsertSelective(List<IEntity> entities) {
-		BatchInsert insert = new BatchInsert(config);
-		return insert.batchInsert(entities, true);
-	}
-	
-	public int batchInsert(List<IEntity> entities, boolean injectAutoIncrementId) {
-		BatchInsert insert = new BatchInsert(config);
-		return insert.batchInsert(entities, injectAutoIncrementId);
-	}
-	
 	
 	public <T> Select<T> select(Class<T> clazz) {
 		Select<T> select = new Select<>(clazz, config);
