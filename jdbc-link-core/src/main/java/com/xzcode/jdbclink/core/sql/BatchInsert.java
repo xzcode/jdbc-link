@@ -80,7 +80,6 @@ public class BatchInsert {
 			
 			String sqlStr = sql.toString();
 			
-				
 			this.config.getJdbcTemplate().batchUpdate(sqlStr, new BatchPreparedStatementSetter() {
 				
 				@Override
