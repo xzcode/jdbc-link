@@ -68,7 +68,7 @@ public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T
 
 	protected EntityInfo entityInfo;
 
-	protected List<OrderParam> orderParams;
+	protected List<OrderParam<T>> orderParams;
 
 	protected LimitParam limit;
 
@@ -238,8 +238,8 @@ public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T
 	}
 	*/
 	@Override
-	public OrderParam orderBy(boolean isSactisfy, String tableAlias, EntityField orderBy) {
-		OrderParam orderParam = new OrderParam(isSactisfy, tableAlias, orderBy, this);
+	public OrderParam<T> orderBy(boolean isSactisfy, String tableAlias, EntityField orderBy) {
+		OrderParam<T> orderParam = new OrderParam<>(isSactisfy, tableAlias, orderBy, this);
 		this.addOrder(orderParam);
 		return orderParam;
 	}
@@ -254,7 +254,7 @@ public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T
 			throw new IllegalArgumentException("OrderBy keyword is illeagal : " + orderBy);
 		}
 
-		this.addOrder(new OrderParam(isSactisfy, tableAlias, orderBy, sorting, this));
+		this.addOrder(new OrderParam<T>(isSactisfy, tableAlias, orderBy, sorting, this));
 		return this;
 	}
 /*	
@@ -270,7 +270,7 @@ public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T
 	
 	*/
 
-	public Select<T> addOrder(OrderParam orderParam) {
+	public Select<T> addOrder(OrderParam<T> orderParam) {
 		if (orderParam.isSactisfy()) {
 			if (this.orderParams == null) {
 				this.orderParams = new LinkedList<>();
@@ -614,7 +614,7 @@ public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T
 		return prefix;
 	}
 
-	public List<OrderParam> getOrderParams() {
+	public List<OrderParam<T>> getOrderParams() {
 		return orderParams;
 	}
 

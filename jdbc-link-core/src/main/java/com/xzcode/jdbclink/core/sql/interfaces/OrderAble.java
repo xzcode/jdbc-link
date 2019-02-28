@@ -8,8 +8,8 @@ public interface OrderAble<T> extends GetSelectAble<T>{
 	
 	
 	
-	public default OrderParam<T> orderBy(EntityField orderBy) {
-		return this.orderBy(true, orderBy.tableAlias(), orderBy);
+	public default Select<T> orderBy(EntityField orderBy) {
+		return this.orderBy(true, orderBy.tableAlias(), orderBy).asc();
 	}
 	
 	public default Select<T> orderByAsc(String tableAlias, EntityField orderBy) {

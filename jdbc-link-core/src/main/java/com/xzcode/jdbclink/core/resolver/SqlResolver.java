@@ -235,14 +235,15 @@ public class SqlResolver implements ISqlResolver {
 		}
 		
 		
-		@SuppressWarnings("rawtypes")
-		List<OrderParam> orderParams = select.getOrderParams();
+		
+		List<?> orderParams = select.getOrderParams();
 		
 		if (orderParams != null && orderParams.size() > 0) {
 			
 			sql.append(" order by ");
 			
-			for (@SuppressWarnings("rawtypes") OrderParam order : orderParams) {
+			for (Object orderObj : orderParams) {
+				OrderParam<?> order = (OrderParam<?>) orderObj;
 				sql
 				.append(order.getTableAlias())
 				.append(order.getTableAlias() == "" ? "" : ".")
