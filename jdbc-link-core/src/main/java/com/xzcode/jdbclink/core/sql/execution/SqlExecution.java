@@ -37,13 +37,27 @@ public class SqlExecution{
 
 	
 	public Map<String, Object> queryMap() {
-		return this.jdbcTemplate.queryForMap(sql, args);
+		try {
+			
+			return this.jdbcTemplate.queryForMap(sql, args);
+			
+		} catch (EmptyResultDataAccessException  e) {
+			return null;
+		}
+		
 	}
 
 
 	
 	public List<Map<String, Object>> queryListMap() {
-		return this.jdbcTemplate.queryForList(sql, args);
+		try {
+			
+			return this.jdbcTemplate.queryForList(sql, args);
+			
+		} catch (EmptyResultDataAccessException  e) {
+			return null;
+		}
+		
 	}
 
 	
