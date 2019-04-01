@@ -59,6 +59,17 @@ public class SqlExecution{
 		}
 		
 	}
+	
+	/**
+	 * 执行update
+	 * 
+	 * @return
+	 * @author zai
+	 * 2019-04-01 16:38:11
+	 */
+	public int executeUpdate() {
+		return this.jdbcTemplate.update(sql, args);
+	}
 
 	
 	
