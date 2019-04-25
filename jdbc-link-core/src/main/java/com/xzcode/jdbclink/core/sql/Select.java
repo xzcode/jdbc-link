@@ -51,12 +51,24 @@ import com.xzcode.jdbclink.core.sql.where.Where;
 import com.xzcode.jdbclink.core.util.ParamUtil;
 import com.xzcode.jdbclink.core.util.ShowSqlUtil;
 
-public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T>>, WhereAble<Select<T>, T>,
-		JoinAble<Select<T>, T>, LimitAble<Select<T>>, OrderAble<T>, QueryAble<T>, AliasAndPrefix {
+public class Select<T> implements 
+HavingAble<Select<T>, T>, 
+GroupByAble<Select<T>>, 
+WhereAble<Select<T>, T>,
+JoinAble<Select<T>, T>, 
+LimitAble<Select<T>>, 
+OrderAble<T>, 
+QueryAble<T>, 
+AliasAndPrefix {
 
 	protected JdbcLinkConfig config;
 
 	protected String mainAlias = ""; // 主表别名
+	
+	/**
+	 * 数据库名称
+	 */
+	protected String database;
 
 	private List<EachRowMapParam> eachRowMapParams;
 
@@ -711,6 +723,14 @@ public class Select<T> implements HavingAble<Select<T>, T>, GroupByAble<Select<T
 
 	public void setConfig(JdbcLinkConfig config) {
 		this.config = config;
+	}
+	
+	public String getDatabase() {
+		return database;
+	}
+	
+	public void setDatabase(String database) {
+		this.database = database;
 	}
 
 }

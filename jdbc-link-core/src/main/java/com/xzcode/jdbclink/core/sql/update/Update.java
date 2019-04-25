@@ -79,7 +79,7 @@ public class Update implements ExecuteAble{
 				Object getObj = field.get(entity);
 				if (getObj != null) {
 					
-					if (entityInfo.getPrimaryKeyFieldInfo().getColumn().equalsIgnoreCase(field.getName())) {
+					if (entityInfo.getPrimaryKeyFieldInfo().getPropName().equalsIgnoreCase(field.getName())) {
 						uid = getObj;
 					}else{
 						args.add(getObj);

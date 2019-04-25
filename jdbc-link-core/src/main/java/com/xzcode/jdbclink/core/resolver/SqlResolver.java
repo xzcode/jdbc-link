@@ -123,15 +123,16 @@ public class SqlResolver implements ISqlResolver {
 		
 		
 		
-		sql
-		.append(" from ")
-		.append(entityInfo.getTable())
+		sql.append(" from ");
+		if (StringUtils.isNoneEmpty(select.getDatabase())) {
+			sql.append(select.getDatabase()).append(".");
+		}
+		sql.append(entityInfo.getTable())
 		.append(" ");
 		if (StringUtils.isNoneEmpty(select.getMainAlias())) {
 			sql.append(select.getMainAlias());
 			sql.append(" ");
 		}
-		;
 		
 		
 		
@@ -143,8 +144,11 @@ public class SqlResolver implements ISqlResolver {
 				
 				sql
 				.append(sJoin.getJoinTag())
-				.append(" ")
-				.append(sJoin.getEntityInfo().getTable())
+				.append(" ");
+				if (StringUtils.isNotEmpty(sJoin.getDatabase())) {
+					sql.append(sJoin.getDatabase()).append(".");
+				}
+				sql.append(sJoin.getEntityInfo().getTable())
 				.append(" ")
 				.append(alias)
 				.append(" ")

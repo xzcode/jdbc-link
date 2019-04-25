@@ -95,6 +95,12 @@ public class JdbcLink{
 		select.setJdbcLink(this);
 		return select;
 	}
+	public <T> Select<T> select(String database, Class<T> clazz) {
+		Select<T> select = new Select<>(clazz, config);
+		select.setJdbcLink(this);
+		select.setDatabase(database);
+		return select;
+	}
 	
 	public <T> Select<T> select(Class<T> clazz, String tableAlias) {
 		Select<T> select = new Select<>(clazz, config);
@@ -102,6 +108,14 @@ public class JdbcLink{
 		select.setJdbcLink(this);
 		return select;
 	}
+	public <T> Select<T> select(String database, Class<T> clazz, String tableAlias) {
+		Select<T> select = new Select<>(clazz, config);
+		select.setMainAlias(tableAlias);
+		select.setJdbcLink(this);
+		select.setDatabase(database);
+		return select;
+	}
+	
 	public <T> T select(Object uid, Class<T> clazz) {
 		Select<T> select = new Select<>(clazz, config);
 		select.setJdbcLink(this);
