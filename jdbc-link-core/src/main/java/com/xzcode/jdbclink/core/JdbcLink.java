@@ -143,8 +143,19 @@ public class JdbcLink{
 		return update;
 	}
 	
+	public Update update(String database,Class<?> clazz) {
+		Update update = new Update(clazz, config);
+		update.setDatabase(database);
+		return update;
+	}
+	
 	public int update(IEntity entity) {
 		Update update = new Update(entity.getClass(), config);
+		return update.update(entity);
+	}
+	public int update(String database, IEntity entity) {
+		Update update = new Update(entity.getClass(), config);
+		update.setDatabase(database);
 		return update.update(entity);
 	}
 	

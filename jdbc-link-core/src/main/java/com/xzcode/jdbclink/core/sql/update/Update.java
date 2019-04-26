@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 
 import com.xzcode.jdbclink.core.JdbcLinkConfig;
@@ -29,6 +30,8 @@ public class Update implements ExecuteAble{
 	protected UpdateSet set;
 	
 	protected ISqlResolver sqlResolver;
+	
+	protected String database;
 	
 	/*protected LimitParam limit;*/
 	
@@ -68,7 +71,11 @@ public class Update implements ExecuteAble{
 			
 			int fieldInfosSize = fieldInfos.size();
 			
-			sql.append(" update ").append(entityInfo.getTable());
+			sql.append(" update ");
+			if (StringUtils.isNotEmpty(this.database)) {
+				sql.append(this.database).append(".");
+			}
+			sql.append(entityInfo.getTable());
 			sql.append(" set ");
 			Object uid = null;
 			for (int i = 0; i < fieldInfosSize; i++) {
@@ -175,7 +182,14 @@ public class Update implements ExecuteAble{
 	public ExecuteAble getExecuteAble() {
 		return this;
 	}
-
+	
+	public String getDatabase() {
+		return database;
+	}
+	
+	public void setDatabase(String database) {
+		this.database = database;
+	}
 	
 	/*public void setLimit(LimitParam limitParam) {
 		this.limit = limitParam;

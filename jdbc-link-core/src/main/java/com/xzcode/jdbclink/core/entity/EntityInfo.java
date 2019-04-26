@@ -6,6 +6,8 @@ public class EntityInfo {
 	
 private EntityFieldInfo primaryKeyFieldInfo;
 	
+	private String database;
+	
 	private String table;
 	
 	private String alias;
@@ -56,7 +58,13 @@ private EntityFieldInfo primaryKeyFieldInfo;
 	public void setFieldInfos(List<EntityFieldInfo> fieldInfos) {
 		this.fieldInfos = fieldInfos;
 	}
-	
-	
+
+	public String getDatabase() {
+		return database;
+	}
+
+	public void setDatabase(String database) {
+		this.database = database;
+	}
 
 }
