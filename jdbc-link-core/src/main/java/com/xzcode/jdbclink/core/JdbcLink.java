@@ -69,6 +69,17 @@ public class JdbcLink{
 		return insert;
 	}
 	
+	public int insert(String database, IEntity entity) {
+		Insert insert = new Insert(entity.getClass(), config);
+		insert.setDatabase(database);
+		return insert.insert(entity, false);
+	}
+	
+	public int insertSelective(String database, IEntity entity) {
+		Insert insert = new Insert(entity.getClass(), config);
+		insert.setDatabase(database);
+		return insert.insert(entity, true);
+	}
 	public int insert(IEntity entity) {
 		Insert insert = new Insert(entity.getClass(), config);
 		return insert.insert(entity, false);
@@ -168,6 +179,12 @@ public class JdbcLink{
 	}
 	
 	
+	public Delete delete(String database, Class<?> clazz) {
+		Delete delete = new Delete(clazz, config);
+		delete.setDatabase(database);
+		return delete;
+		
+	}
 	public Delete delete(Class<?> clazz) {
 		Delete delete = new Delete(clazz, config);
 		return delete;
@@ -177,7 +194,12 @@ public class JdbcLink{
 	public int delete(Object uid, Class<?> clazz) {
 		Delete delete = new Delete(clazz, config);
 		return delete.byId(uid);
-		
+	}
+	
+	public int delete(Object uid, Class<?> clazz, String database) {
+		Delete delete = new Delete(clazz, config);
+		delete.setDatabase(database);
+		return delete.byId(uid);
 	}
 	
 	

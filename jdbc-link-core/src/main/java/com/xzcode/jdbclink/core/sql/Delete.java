@@ -2,6 +2,8 @@ package com.xzcode.jdbclink.core.sql;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.xzcode.jdbclink.core.JdbcLinkConfig;
 import com.xzcode.jdbclink.core.entity.EntityInfo;
 import com.xzcode.jdbclink.core.entity.model.EntityField;
@@ -28,6 +30,8 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 	
 	protected LimitParam limit;
 	
+	protected String database;
+	
 	public Delete(Class<?> clazz, JdbcLinkConfig config) {
 		this.sqlResolver = config.getSqlResolver();
 		this.config = config;
@@ -38,9 +42,12 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 	public int byId(Object uid) {
 		StringBuilder sb = config.getStringBuilderPool().get();
 		sb
-		.append(" delete from ")
-		.append(entityInfo.getTable())
-		.append(" where ")
+		.append(" delete from ");
+		if(StringUtils.isNotEmpty(this.database)) {
+			sb.append(this.database).append(".");
+		}
+		sb.append(entityInfo.getTable());
+		sb.append(" where ")
 		.append(entityInfo.getPrimaryKeyFieldInfo().getColumn())
 		.append(" = ? ");
 		;
@@ -53,8 +60,11 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 	public int byField(EntityField field, Object value) {
 		StringBuilder sb = config.getStringBuilderPool().get();
 		sb
-		.append(" delete from ")
-		.append(entityInfo.getTable())
+		.append(" delete from ");
+		if(StringUtils.isNotEmpty(this.database)) {
+			sb.append(this.database).append(".");
+		}
+		sb.append(entityInfo.getTable())
 		.append(" where ")
 		.append(field.fieldName())
 		.append(" = ? ");
@@ -117,5 +127,11 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 	public LimitParam getLimit() {
 		return this.limit;
 	}
+	public String getDatabase() {
+		return database;
+	}
 	
+	public void setDatabase(String database) {
+		this.database = database;
+	}
 }

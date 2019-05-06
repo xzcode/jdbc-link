@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 
@@ -18,6 +19,8 @@ import com.xzcode.jdbclink.core.entity.IEntity;
 import com.xzcode.jdbclink.core.util.ShowSqlUtil;
 
 public class Insert{
+	
+	protected String database;
 	
 	protected EntityInfo entityInfo;
 	
@@ -47,7 +50,11 @@ public class Insert{
 			StringBuilder sql = config.getStringBuilderPool().get();
 			StringBuilder valuesSql = config.getStringBuilderPool().get();
 			
-			sql.append(" insert into ").append(entityInfo.getTable());
+			sql.append(" insert into ");
+			if(StringUtils.isNotEmpty(this.database)) {
+				sql.append(this.database).append(".");
+			}
+			sql.append(entityInfo.getTable());
 			sql.append(" ( ");
 			List<EntityFieldInfo> fieldInfos = entityInfo.getFieldInfos();
 			List<Object> args = new ArrayList<>(fieldInfos.size());
@@ -130,6 +137,15 @@ public class Insert{
 			throw new RuntimeException(e);
 		}
 		
+	}
+	
+	
+	public String getDatabase() {
+		return database;
+	}
+	
+	public void setDatabase(String database) {
+		this.database = database;
 	}
 
 }
