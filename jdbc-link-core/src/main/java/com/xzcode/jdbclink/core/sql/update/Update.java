@@ -90,14 +90,14 @@ public class Update implements ExecuteAble{
 						uid = getObj;
 					}else{
 						args.add(getObj);
-						sql.append(fieldInfos.get(i).getColumn()).append("=?,");
+						sql.append("`").append(fieldInfos.get(i).getColumn()).append("`").append("=?,");
 					}
 				}else {
 					if (nullableFields != null && nullableFields.length > 0) {
 						for (EntityField nullCol : nullableFields) {
 							if (fieldInfos.get(i).getColumn().equals(nullCol.fieldName())) {
 								args.add(null);
-								sql.append(fieldInfos.get(i).getColumn()).append("=?,");
+								sql.append("`").append(fieldInfos.get(i).getColumn()).append("`").append("=?,");
 							}
 						}
 					}
@@ -107,7 +107,9 @@ public class Update implements ExecuteAble{
 			sql.setLength(sql.length() - 1);
 			
 			sql.append(" where ")
+			.append("`")
 			.append(entityInfo.getPrimaryKeyFieldInfo().getColumn())
+			.append("`")
 			.append(" = ? ");
 			args.add(uid);
 			

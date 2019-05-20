@@ -67,7 +67,11 @@ public class Insert{
 				field.setAccessible(true);
 				if (field.get(entity) != null) {
 					args.add(field.get(entity));
-					sql.append(fieldInfos.get(i).getColumn()).append(",");
+					sql
+					.append("`")
+					.append(fieldInfos.get(i).getColumn())
+					.append("`")
+					.append(",");
 					
 					valuesSql.append("?,");
 				}

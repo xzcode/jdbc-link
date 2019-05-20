@@ -82,9 +82,9 @@ public class SqlResolver implements ISqlResolver {
 					}else {
 						columnsSql
 						.append(sp.getTableAlias())
-						.append('.')
+						.append(".`")
 						.append(sp.getColumn())
-						.append(" ")
+						.append("` ")
 						.append(sp.getAlias())
 						.append(" ")
 						.append(",");
@@ -211,7 +211,7 @@ public class SqlResolver implements ISqlResolver {
 				if (StringUtils.isNotEmpty(groupByParam.getAlias())) {
 					sql.append(groupByParam.getAlias()).append(".");
 				}
-				sql.append(groupByParam.getColumn()).append(",");
+				sql.append("`").append(groupByParam.getColumn()).append("`").append(",");
 			}
 			sql.setLength(sql.length()-1);
 			
@@ -315,13 +315,13 @@ public class SqlResolver implements ISqlResolver {
 					
 						if (updateParam.getField2() != null) {
 							sql
-							.append(updateParam.getField().fieldName())
-							.append(" = ")
+							.append("`").append(updateParam.getField().fieldName()).append("`")
+							.append(" = `")
 							.append(updateParam.getField2().fieldName())
-							.append(",");
+							.append("`,");
 						}else {
 							sql
-							.append(updateParam.getField().fieldName())
+							.append("`").append(updateParam.getField().fieldName()).append("`")
 							.append(" = ? ,");
 							args.add(updateParam.getVal());
 						}
@@ -583,12 +583,11 @@ public class SqlResolver implements ISqlResolver {
 					if (handledNums != 0) {
 						sql.append(param.getConnect()).append(" ");
 					}
-					
 					sql
 					.append(" ")
 					.append(param.getTableAlias())
 					.append(".")
-					.append(param.getField().fieldName())
+					.append("`").append(param.getField().fieldName()).append("`")
 					.append(" ")
 					.append(param.getTag())
 					.append(" ? and ? ")
@@ -611,7 +610,7 @@ public class SqlResolver implements ISqlResolver {
 						.append(" ")
 						.append(param.getTableAlias())
 						.append(".")
-						.append(param.getField().fieldName())
+						.append("`").append(param.getField().fieldName()).append("`")
 						.append(" ")
 						.append(param.getTag())
 						.append(" (");
@@ -640,7 +639,7 @@ public class SqlResolver implements ISqlResolver {
 					.append(" locate( ?, ")
 					.append(param.getTableAlias())
 					.append(".")
-					.append(param.getField().fieldName())
+					.append("`").append(param.getField().fieldName()).append("`")
 					.append(") > 0 ")
 					;
 					args.add(param.getVal());
@@ -657,7 +656,7 @@ public class SqlResolver implements ISqlResolver {
 					.append(" ")
 					.append(param.getTableAlias())
 					.append(".")
-					.append(param.getField().fieldName())
+					.append("`").append(param.getField().fieldName()).append("`")
 					.append(" ")
 					.append(param.getTag())
 					.append(" ");
@@ -665,7 +664,7 @@ public class SqlResolver implements ISqlResolver {
 						sql
 						.append(param.getTableAlias2())
 						.append(".")
-						.append(param.getField2().fieldName())
+						.append("`").append(param.getField2().fieldName()).append("`")
 						.append(" ");
 					}else{
 						sql.append(" ? ");
@@ -708,7 +707,7 @@ public class SqlResolver implements ISqlResolver {
 			selectParam = new SelectParam();
 			selectParam.setType(SelectParam.TypeConstant.SQL_PART);
 			
-			selectParam.setSqlPart(tableAlias + "." + fieldInfos.get(i).getColumn() + " " + fieldInfos.get(i).getPropName());
+			selectParam.setSqlPart(tableAlias + ".`" + fieldInfos.get(i).getColumn() + "` " + fieldInfos.get(i).getPropName());
 			
 			/*
 			selectParam.setTableAlias(tableAlias);

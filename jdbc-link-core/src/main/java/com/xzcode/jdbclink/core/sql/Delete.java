@@ -47,8 +47,11 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 			sb.append(this.database).append(".");
 		}
 		sb.append(entityInfo.getTable());
-		sb.append(" where ")
+		sb
+		.append(" where ")
+		.append("`")
 		.append(entityInfo.getPrimaryKeyFieldInfo().getColumn())
+		.append("`")
 		.append(" = ? ");
 		;
 		String sql = sb.toString();
@@ -64,7 +67,8 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 		if(StringUtils.isNotEmpty(this.database)) {
 			sb.append(this.database).append(".");
 		}
-		sb.append(entityInfo.getTable())
+		sb
+		.append(entityInfo.getTable())
 		.append(" where ")
 		.append(field.fieldName())
 		.append(" = ? ");
