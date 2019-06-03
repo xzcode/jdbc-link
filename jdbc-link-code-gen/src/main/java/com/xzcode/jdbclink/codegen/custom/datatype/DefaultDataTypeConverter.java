@@ -43,6 +43,10 @@ public class DefaultDataTypeConverter implements IDataTypeConverter {
 			
 		case "float":
 			return Float.class;
+			
+		case "bit":
+			return Boolean.class;
+
 
 		default:
 			return String.class;
