@@ -1,5 +1,0 @@
-rootProject.name = "jdbc-link"
-include ":${rootProject.name}-core"
-include ":${rootProject.name}-autoconfig"
-include ":${rootProject.name}-code-gen"
-include ":${rootProject.name}-test"
