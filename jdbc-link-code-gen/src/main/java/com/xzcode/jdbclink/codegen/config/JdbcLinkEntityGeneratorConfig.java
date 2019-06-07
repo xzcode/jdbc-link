@@ -16,7 +16,7 @@ public class JdbcLinkEntityGeneratorConfig{
 	private String dbPassword;
 	
 	/** 实体类所在数据库名称. */
-	private String entityDatabaseName;
+	private String[] entityDatabaseName;
 	
 	/** 项目基础包. */
 	private String entityBasicPackage;
@@ -69,11 +69,11 @@ public class JdbcLinkEntityGeneratorConfig{
 	}
 	
 	
-	public String getEntityDatabaseName() {
+	public String[] getEntityDatabaseName() {
 		return entityDatabaseName;
 	}
 	
-	public void setEntityDatabaseName(String entityDatabaseName) {
+	public void setEntityDatabaseName(String[] entityDatabaseName) {
 		this.entityDatabaseName = entityDatabaseName;
 	}
 	

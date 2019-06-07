@@ -11,7 +11,7 @@
   	<jdk.version>1.8</jdk.version>
   	<spring.boot.version>2.1.5.RELEASE</spring.boot.version>
   </properties>
-
+  
   <profiles>
         <profile>
             <id>dev</id>
@@ -180,6 +180,6 @@
   	<module>jdbc-link-autoconfig</module>
   	<module>jdbc-link-code-gen</module>
   	<module>jdbc-link-core</module>
-  	<module>jdbc-link-test</module>
+  	<!-- <module>jdbc-link-test</module> -->
   </modules>
 </project>

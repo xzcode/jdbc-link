@@ -20,7 +20,7 @@ public class JdbcLinkExtraGeneratorConfig{
 	private String dbPassword;
 	
 	/** 数据库名称. */
-	private String databaseName;
+	private String[] databaseName;
 	
 	/** 模版文件路径. */
 	private String templatePath;
@@ -48,7 +48,7 @@ public class JdbcLinkExtraGeneratorConfig{
 	
 
 
-	public JdbcLinkExtraGeneratorConfig(String dbUrl, String dbUserName, String dbPassword, String databaseName,
+	public JdbcLinkExtraGeneratorConfig(String dbUrl, String dbUserName, String dbPassword, String[] databaseName,
 			String templatePath, Class<?> templateLoaderClass, List<ExtraTemplateInfo> templateInfos,
 			Map<String, Object> extraData, boolean coverOldFiles) {
 		super();
@@ -89,11 +89,11 @@ public class JdbcLinkExtraGeneratorConfig{
 		this.dbPassword = dbPassword;
 	}
 
-	public String getDatabaseName() {
+	public String[] getDatabaseName() {
 		return databaseName;
 	}
 
-	public void setDatabaseName(String databaseName) {
+	public void setDatabaseName(String[] databaseName) {
 		this.databaseName = databaseName;
 	}
 

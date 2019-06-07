@@ -51,10 +51,8 @@ public class Insert{
 			StringBuilder valuesSql = config.getStringBuilderPool().get();
 			
 			sql.append(" insert into ");
-			if(StringUtils.isNotEmpty(this.database)) {
-				sql.append(this.database).append(".");
-			}
-			sql.append(entityInfo.getTable());
+			sql.append("`").append(entityInfo.getDatabase()).append("`").append(".");
+			sql.append("`").append(entityInfo.getTable()).append("`");
 			sql.append(" ( ");
 			List<EntityFieldInfo> fieldInfos = entityInfo.getFieldInfos();
 			List<Object> args = new ArrayList<>(fieldInfos.size());

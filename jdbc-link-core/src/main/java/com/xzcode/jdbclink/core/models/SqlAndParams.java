@@ -1,5 +1,6 @@
 package com.xzcode.jdbclink.core.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SqlAndParams {
@@ -10,7 +11,49 @@ public class SqlAndParams {
 	private String countSql;
 	private List<Object> countParams;
 	
+	private List<Object> results;
 	
+	
+	
+	
+	public SqlAndParams() {
+	}
+
+	
+
+	public SqlAndParams(String sql, List<Object> args) {
+		super();
+		this.sql = sql;
+		this.args = args;
+	}
+
+
+
+	public SqlAndParams(String sql, List<Object> args, List<Object> result) {
+		super();
+		this.sql = sql;
+		this.args = args;
+		this.results = result;
+	}
+	
+	
+	
+	public SqlAndParams(String sql, List<Object> args, String countSql, List<Object> countParams) {
+		super();
+		this.sql = sql;
+		this.args = args;
+		this.countSql = countSql;
+		this.countParams = countParams;
+	}
+
+	public void addResult(Object result) {
+		if (result == null) {
+			result = new ArrayList<>(10);
+		}
+		this.results.add(result);
+	}
+
+
 	public String getSql() {
 		return sql;
 	}
@@ -35,7 +78,12 @@ public class SqlAndParams {
 	public void setCountParams(List<Object> countParams) {
 		this.countParams = countParams;
 	}
-
+	public List<Object> getResults() {
+		return results;
+	}
+	public void setResults(List<Object> result) {
+		this.results = result;
+	}
 	
 	
 	

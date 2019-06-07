@@ -98,7 +98,7 @@ public class JdbcLink{
 	
 	public void batchInsert(List<IEntity> entities) {
 		BatchInsert insert = new BatchInsert(config);
-		insert.batchInsert(entities, false);
+		insert.batchInsert(entities);
 	}
 	
 	public <T> Select<T> select(Class<T> clazz) {

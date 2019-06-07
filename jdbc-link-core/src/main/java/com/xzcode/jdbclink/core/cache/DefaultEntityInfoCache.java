@@ -2,6 +2,7 @@ package com.xzcode.jdbclink.core.cache;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +23,7 @@ import com.xzcode.jdbclink.core.exception.JdbcLinkRuntimeException;
  */
 public class DefaultEntityInfoCache implements IEntityInfoCache{
 	
-	private static final Map<Class<?>, EntityInfo> CACHE_MAP = new ConcurrentHashMap<>();
+	private static final Map<Class<?>, EntityInfo> CACHE_MAP = new HashMap<>();
 
 	@Override
 	public EntityInfo getEntityInfo(Class<?> clazz) {
@@ -59,6 +60,8 @@ public class DefaultEntityInfoCache implements IEntityInfoCache{
 		
 		entityInfo.setAlias(table.name());
 		
+		entityInfo.setDatabase(table.database());
+		
 		List<EntityFieldInfo> fieldInfos = entityInfo.getFieldInfos();
 		EntityFieldInfo fieldInfo = null;
 		Field[] fields = clazz.getDeclaredFields();
@@ -72,6 +75,8 @@ public class DefaultEntityInfoCache implements IEntityInfoCache{
 				fieldInfo.setField(fd);
 				fieldInfo.setLength(column.length());
 				fieldInfo.setNullable(column.nullable());
+				
+				
 				
 				Id id = fd.getAnnotation(Id.class);
 				if(id != null){

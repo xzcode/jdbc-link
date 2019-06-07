@@ -72,10 +72,8 @@ public class Update implements ExecuteAble{
 			int fieldInfosSize = fieldInfos.size();
 			
 			sql.append(" update ");
-			if (StringUtils.isNotEmpty(this.database)) {
-				sql.append(this.database).append(".");
-			}
-			sql.append(entityInfo.getTable());
+			sql.append("`").append(entityInfo.getDatabase()).append("`").append(".");
+			sql.append("`").append(entityInfo.getTable()).append("`");
 			sql.append(" set ");
 			Object uid = null;
 			for (int i = 0; i < fieldInfosSize; i++) {

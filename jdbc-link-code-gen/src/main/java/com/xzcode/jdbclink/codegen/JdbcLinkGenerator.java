@@ -3,6 +3,7 @@ package com.xzcode.jdbclink.codegen;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,12 +170,17 @@ public class JdbcLinkGenerator {
 	public void generateEntities(boolean coverOldFiles) {
 		
 		try {
-			
-			List<TableEntityInfo> tableEntityInfos = databaseInfoAdapter.getTableInfos(entityGeneratorConfig.getEntityDatabaseName());
+			List<TableEntityInfo> tableEntityInfos = new ArrayList<>();
+			String[] databases= entityGeneratorConfig.getEntityDatabaseName();
+			for (String db : databases) {
+				tableEntityInfos.addAll(databaseInfoAdapter.getTableInfos(db));
+				
+				
+			}
 			Configuration entityTemplateConfig = getEntityTemplateConfig();
 			Template template = entityTemplateConfig.getTemplate("entity-java.ftl");
-			
 			for (TableEntityInfo tableEntityInfo : tableEntityInfos) {
+				
 				String modulePackageName = moduleNameGenerator.generateModulePackageName(tableEntityInfo.getTableName(), null, null);
 				//String packagePath = entityGeneratorConfig.getEntityBasicPackage().replaceAll("\\.", "/");
 				String entityBasicOutputPath = entityGeneratorConfig.getEntityBasicOutputPath();
@@ -201,6 +207,7 @@ public class JdbcLinkGenerator {
 					template.process(dataModel, writer);
 				}
 			}
+			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} 
@@ -294,7 +301,13 @@ public class JdbcLinkGenerator {
 	 * 2018-04-22
 	 */
 	public List<TableEntityInfo> getTableEntityInfos() {
-		return databaseInfoAdapter.getTableInfos(entityGeneratorConfig.getEntityDatabaseName());
+		List<TableEntityInfo> infos = new ArrayList<>();
+		String[] databases = entityGeneratorConfig.getEntityDatabaseName();
+		for (String db : databases) {
+			infos.addAll(databaseInfoAdapter.getTableInfos(db));
+		}
+		
+		return infos;
 	}
 	
 	/**
@@ -311,7 +324,12 @@ public class JdbcLinkGenerator {
 		try {
 			
 			//获取表实体信息
-			List<TableEntityInfo> tableEntityInfos = databaseInfoAdapter.getTableInfos(entityGeneratorConfig.getEntityDatabaseName());
+			List<TableEntityInfo> tableEntityInfos =  new ArrayList<>();
+			List<TableEntityInfo> infos = new ArrayList<>();
+			String[] databases = entityGeneratorConfig.getEntityDatabaseName();
+			for (String db : databases) {
+				infos.addAll(databaseInfoAdapter.getTableInfos(db));
+			}
 			
 			Configuration extraTemplateConfig = getExtraTemplateConfig(generatorConfig.getTemplateLoaderClass(), generatorConfig.getTemplatePath());
 			for (TableEntityInfo tableEntityInfo : tableEntityInfos) {

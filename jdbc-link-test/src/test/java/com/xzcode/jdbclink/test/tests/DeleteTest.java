@@ -18,6 +18,7 @@ import com.xzcode.jdbclink.core.models.Pager;
 import com.xzcode.jdbclink.test.JdbcLinkTestApp;
 import com.xzcode.jdbclink.test.entity.Category;
 import com.xzcode.jdbclink.test.entity.Product;
+import com.xzcode.jdbclink.test.entity.Student;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JdbcLinkTestApp.class)
@@ -40,6 +41,12 @@ public class DeleteTest {
 		
 		jdbcLink.delete(85,Product.class);
 				
+	}
+	@Test
+	public void delete04() throws SQLException {
+		
+		jdbcLink.delete(3,Student.class);
+		
 	}
 	
 

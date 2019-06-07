@@ -15,12 +15,19 @@ import java.lang.String;
  *  实体类
  * 
  * @author JdbcLinkGenerator
- * 2018-09-15 00:26:12
+ * 2019-06-07 15:42:23
  */
 @Entity
-@Table(name = Category.__TABLE_NAME__, alias = Category.__TABLE_NAME__)
+@Table(database = Category.__DATABASE_NAME__, name = Category.__TABLE_NAME__, alias = Category.__TABLE_NAME__)
 public class Category implements IEntity {
+	
+	private static final long serialVersionUID = 1L;
 
+	/**
+	 * 所在数据库名称
+	 */
+	public static final String __DATABASE_NAME__ = "jdbc-link-test";
+	
 	/**
 	 *  表名
 	 */

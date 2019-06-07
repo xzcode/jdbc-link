@@ -1,6 +1,5 @@
 package com.xzcode.jdbclink.core.sql.param.select;
 
-import com.xzcode.jdbclink.core.entity.model.EntityField;
 import com.xzcode.jdbclink.core.sql.Select;
 
 /**

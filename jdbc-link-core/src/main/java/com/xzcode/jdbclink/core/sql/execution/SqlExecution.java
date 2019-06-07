@@ -1,12 +1,9 @@
 package com.xzcode.jdbclink.core.sql.execution;
 
-import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +13,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 
-import com.xzcode.jdbclink.core.entity.EntityFieldInfo;
-import com.xzcode.jdbclink.core.entity.IEntity;
 import com.xzcode.jdbclink.core.util.ShowSqlUtil;
 
 public class SqlExecution{

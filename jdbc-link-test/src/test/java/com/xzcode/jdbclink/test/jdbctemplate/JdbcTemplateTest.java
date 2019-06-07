@@ -25,7 +25,7 @@ public class JdbcTemplateTest {
 	@Test
 	public void jdbcTemplateTest01() throws SQLException {
 		
-		List<Map<String, Object>> query = jdbcTemplate.query("select * from shose_info", new ListMapRowMapper(new DefaultKeyFormatter(), new DefaultValueFormatter()));
+		List<Map<String, Object>> query = jdbcTemplate.query("select * from product", new ListMapRowMapper(new DefaultKeyFormatter(), new DefaultValueFormatter()));
 		System.out.println(query);
 	}
 

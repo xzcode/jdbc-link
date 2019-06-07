@@ -19,6 +19,15 @@ import java.lang.annotation.Target;
 public @interface Table {
 	
 	/**
+	 * 数据库名称
+	 * @return
+	 * 
+	 * @author zai
+	 * 2019-06-07 15:03:24
+	 */
+    String database() default "";
+	
+	/**
 	 * 表名
 	 * @return
 	 * 

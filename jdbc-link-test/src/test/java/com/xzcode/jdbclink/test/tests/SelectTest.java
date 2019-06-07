@@ -17,6 +17,8 @@ import com.xzcode.jdbclink.core.models.Pager;
 import com.xzcode.jdbclink.test.JdbcLinkTestApp;
 import com.xzcode.jdbclink.test.entity.Category;
 import com.xzcode.jdbclink.test.entity.Product;
+import com.xzcode.jdbclink.test.entity.SchoolClass;
+import com.xzcode.jdbclink.test.entity.Student;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JdbcLinkTestApp.class)
@@ -115,6 +117,32 @@ public class SelectTest {
 		.pageListMap();
 
 		System.out.println(gson.toJson(pager));
+		
+	}
+	
+	@Test
+	public void test06() throws SQLException {
+		
+		List<Map<String, Object>> list = jdbcLink.select(Student.class).queryListMap();
+		
+		for (Map<String, Object> map : list) {
+			System.out.println(map);
+		}
+				
+	}
+	@Test
+	public void test07() throws SQLException {
+		
+		List<Map<String, Object>> list = jdbcLink.select(Student.class)
+				.column(Student.ALL_)
+				.column(SchoolClass.ALL_)
+				.leftJoin(SchoolClass.class)
+					.on().eq(SchoolClass.UID, Student.CLASS_ID)
+				.queryListMap();
+		
+		for (Map<String, Object> map : list) {
+			System.out.println(map);
+		}
 		
 	}
 

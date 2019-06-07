@@ -110,7 +110,8 @@ AliasAndPrefix {
 		this.sqlResolver = config.getSqlResolver();
 		this.config = config;
 		this.clazz = clazz;
-		mainAlias = this.entityInfo.getAlias();
+		this.mainAlias = this.entityInfo.getAlias();
+		this.database = this.entityInfo.getDatabase();
 	}
 	
 	public Select<T> column(String tableAlias, String column){

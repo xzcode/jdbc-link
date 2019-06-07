@@ -22,7 +22,7 @@ private JdbcTemplate jdbcTemplate;
 	@Test
 	public void genCodeTest01() throws SQLException {
 		JdbcLinkEntityGeneratorConfig config = new JdbcLinkEntityGeneratorConfig();
-		config.setEntityDatabaseName("jdbc-link-test");
+		config.setEntityDatabaseName(new String[] {"jdbc-link-test", "jdbc-link-test2"});
 		config.setDbUrl("jdbc:mysql://common.host:8306/jdbc-link-test?useSSL=false");
 		config.setDbUserName("root");
 		config.setDbPassword("123456");
