@@ -84,13 +84,13 @@ public class SqlResolver implements ISqlResolver {
 						.append(sp.getTableAlias())
 						.append(".`")
 						.append(sp.getColumn())
-						.append("` ")
-						.append(sp.getAlias())
-						.append(" ")
-						.append(",");
+						.append("`");
+						if (StringUtils.isNotEmpty(sp.getAlias())) {
+							columnsSql.append(" ").append(sp.getAlias()).append(" ");
+						}
+						columnsSql.append(",");
 						;
 					}
-					
 					
 			}else {
 				columnsSql
