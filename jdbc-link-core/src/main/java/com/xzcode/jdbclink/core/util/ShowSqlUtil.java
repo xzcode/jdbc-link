@@ -7,15 +7,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.xzcode.jdbclink.core.models.SqlAndParams;
 
 public class ShowSqlUtil {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ShowSqlUtil.class);
+	private static final Gson GSON = new GsonBuilder()
+			//.setPrettyPrinting()
+			.serializeNulls()
+			.create();
 	
 	public static void debugSqlAndParams(SqlAndParams sqlAndParams) {
 		
-		if (LOGGER.isDebugEnabled()) {
+		if (sqlAndParams != null && LOGGER.isDebugEnabled()) {
 			StringBuilder sb = new StringBuilder(100);
 			if (sqlAndParams.getSql() != null) {
 				sb.append("\nSQL query: ").append(sqlAndParams.getSql());
@@ -25,9 +31,11 @@ public class ShowSqlUtil {
 				sb.append("\nSQL count query: ").append(sqlAndParams.getCountSql());
 				sb.append("\nSQL count param: ").append(sqlAndParams.getCountParams());
 			}
-			if (sqlAndParams.getCountResult() != null) {
-				sb.append("\nSQL count result: ").append(sqlAndParams.getCountResult());
+			if (sqlAndParams.getResults() != null) {
+				sb.append("\nSQL result: ").append(GSON.toJson(sqlAndParams.getResults())).append("\n");
 			}
+			
+			LOGGER.debug(sb.toString());
 		}
 	}
 	

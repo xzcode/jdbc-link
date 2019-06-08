@@ -124,7 +124,7 @@ public class SqlResolver implements ISqlResolver {
 		
 		
 		sql.append(" from ");
-		sql.append("`").append(select.getDatabase()).append("`.");
+		sql.append("`").append(select.getEntityInfo().getDatabase()).append("`.");
 		sql.append(entityInfo.getTable())
 		.append(" ");
 		if (StringUtils.isNoneEmpty(select.getMainAlias())) {
@@ -143,7 +143,7 @@ public class SqlResolver implements ISqlResolver {
 				sql
 				.append(sJoin.getJoinTag())
 				.append(" ");
-				sql.append("`").append(sJoin.getDatabase()).append("`").append(".");
+				sql.append("`").append(sJoin.getEntityInfo().getDatabase()).append("`").append(".");
 				sql.append(sJoin.getEntityInfo().getTable())
 				.append(" ")
 				.append(alias)

@@ -2,7 +2,7 @@
 spring:
   datasource:
     url: jdbc:mysql://common.host:8306/jdbc-link-test?useSSL=false
-    driverClassName: com.mysql.jdbc.Driver
+    driverClassName: com.mysql.cj.jdbc.Driver
     username: root
     password: 123456
     
@@ -11,8 +11,10 @@ xz:
     enabled: true
     scanPackage: com.xzcode.jdbclink.test.entity 
     
+        
 logging:
-  level:
+  file: /app/jdbclink-test/jdbclinktest.log
+  level: 
     root: info
-    com:
+    com: 
       xzcode: debug

@@ -8,7 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 
@@ -16,9 +17,13 @@ import com.xzcode.jdbclink.core.JdbcLinkConfig;
 import com.xzcode.jdbclink.core.entity.EntityFieldInfo;
 import com.xzcode.jdbclink.core.entity.EntityInfo;
 import com.xzcode.jdbclink.core.entity.IEntity;
+import com.xzcode.jdbclink.core.exception.JdbcLinkRuntimeException;
+import com.xzcode.jdbclink.core.models.SqlAndParams;
 import com.xzcode.jdbclink.core.util.ShowSqlUtil;
 
 public class Insert{
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(Insert.class);
 	
 	protected String database;
 	
@@ -106,7 +111,6 @@ public class Insert{
 					return prepareStatement;
 				}
 			};
-			
 						
 			//注入自增id
 			if (injectAutoIncrementId) {
@@ -129,16 +133,38 @@ public class Insert{
 					}
 				}
 				
-				return result;
-				
+				return (int) this.update(sqlStr, args, result);
 			}else{
-				return this.config.getJdbcTemplate().update(statement);
+				int result = this.config.getJdbcTemplate().update(statement);
+				return (int) this.update(sqlStr, args, result);
 			}
-		
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		
+	}
+	
+	private Object update(String sql, List<Object> args, Object result) {
+		try {
+			
+			if (LOGGER.isDebugEnabled()) {
+				SqlAndParams sqlAndParams = new SqlAndParams();
+				sqlAndParams.setSql(sql);
+				sqlAndParams.setArgs(args);
+				sqlAndParams.addResult(result);
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
+			return result;
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					SqlAndParams sqlAndParams = new SqlAndParams();
+					sqlAndParams.setSql(sql);
+					sqlAndParams.setArgs(args);
+					ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+				}
+				
+				throw new JdbcLinkRuntimeException(e);
+			}
 	}
 	
 	

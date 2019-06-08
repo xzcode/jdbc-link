@@ -30,13 +30,9 @@ public class JdbcLink{
 	private IEntityInfoCache entityInfoCache;
 	
 	
-	
-	
-	
 	public JdbcLink(JdbcLinkConfig config) {
 		super();
 		setConfig(config);
-		
 	}
 
 
@@ -51,7 +47,6 @@ public class JdbcLink{
 		this.entityInfoCache.addEntityInfo(clazz);
 	}
 	
-	
 	public void setConfig(JdbcLinkConfig config) {
 		this.config = config;
 		this.jdbcTemplate = config.getJdbcTemplate();
@@ -63,23 +58,11 @@ public class JdbcLink{
 		return config;
 	}
 	
-	
 	public Insert insert(Class<?> clazz) {
 		Insert insert = new Insert(clazz, config);
 		return insert;
 	}
 	
-	public int insert(String database, IEntity entity) {
-		Insert insert = new Insert(entity.getClass(), config);
-		insert.setDatabase(database);
-		return insert.insert(entity, false);
-	}
-	
-	public int insertSelective(String database, IEntity entity) {
-		Insert insert = new Insert(entity.getClass(), config);
-		insert.setDatabase(database);
-		return insert.insert(entity, true);
-	}
 	public int insert(IEntity entity) {
 		Insert insert = new Insert(entity.getClass(), config);
 		return insert.insert(entity, false);
@@ -106,24 +89,11 @@ public class JdbcLink{
 		select.setJdbcLink(this);
 		return select;
 	}
-	public <T> Select<T> select(String database, Class<T> clazz) {
-		Select<T> select = new Select<>(clazz, config);
-		select.setJdbcLink(this);
-		select.setDatabase(database);
-		return select;
-	}
 	
 	public <T> Select<T> select(Class<T> clazz, String tableAlias) {
 		Select<T> select = new Select<>(clazz, config);
 		select.setMainAlias(tableAlias);
 		select.setJdbcLink(this);
-		return select;
-	}
-	public <T> Select<T> select(String database, Class<T> clazz, String tableAlias) {
-		Select<T> select = new Select<>(clazz, config);
-		select.setMainAlias(tableAlias);
-		select.setJdbcLink(this);
-		select.setDatabase(database);
 		return select;
 	}
 	
@@ -154,22 +124,11 @@ public class JdbcLink{
 		return update;
 	}
 	
-	public Update update(String database,Class<?> clazz) {
-		Update update = new Update(clazz, config);
-		update.setDatabase(database);
-		return update;
-	}
 	
 	public int update(IEntity entity) {
 		Update update = new Update(entity.getClass(), config);
 		return update.update(entity);
 	}
-	public int update(String database, IEntity entity) {
-		Update update = new Update(entity.getClass(), config);
-		update.setDatabase(database);
-		return update.update(entity);
-	}
-	
 	
 	public int updateNullable(IEntity entity, EntityField...nullableFields) {
 		Update update = new Update(entity.getClass(), config);
@@ -178,13 +137,6 @@ public class JdbcLink{
 		return update.updateNullable(entity, nullableFields);
 	}
 	
-	
-	public Delete delete(String database, Class<?> clazz) {
-		Delete delete = new Delete(clazz, config);
-		delete.setDatabase(database);
-		return delete;
-		
-	}
 	public Delete delete(Class<?> clazz) {
 		Delete delete = new Delete(clazz, config);
 		return delete;
@@ -193,12 +145,6 @@ public class JdbcLink{
 	
 	public int delete(Object uid, Class<?> clazz) {
 		Delete delete = new Delete(clazz, config);
-		return delete.byId(uid);
-	}
-	
-	public int delete(Object uid, Class<?> clazz, String database) {
-		Delete delete = new Delete(clazz, config);
-		delete.setDatabase(database);
 		return delete.byId(uid);
 	}
 	

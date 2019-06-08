@@ -47,10 +47,16 @@ public class SqlAndParams {
 	}
 
 	public void addResult(Object result) {
-		if (result == null) {
-			result = new ArrayList<>(10);
+		if (results == null) {
+			results = new ArrayList<>(10);
 		}
 		this.results.add(result);
+	}
+	public void addArgs(Object obj) {
+		if (args == null) {
+			args = new ArrayList<>(10);
+		}
+		this.args.add(obj);
 	}
 
 

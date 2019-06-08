@@ -60,18 +60,7 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 		String sql = sb.toString();
 		config.getStringBuilderPool().returnOject(sb);
 		
-		try {
-			
-		int update = this.config.getJdbcTemplate().update(sql, uid);
-		if (LOGGER.isDebugEnabled()) {
-			SqlAndParams sqlAndParams = new SqlAndParams(sql, args)
-			sqlAndParams.setSql(sql);
-			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		}
-		return update;
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
+		return this.update(sql, uid);
 	}
 	
 	public int byField(EntityField field, Object value) {
@@ -92,11 +81,32 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 		;
 		String sql = sb.toString();
 		config.getStringBuilderPool().returnOject(sb);
-		ShowSqlUtil.debugSqlAndParams(sql, value);
-		return this.config.getJdbcTemplate().update(sql, value);
+		return this.update(sql, value);
 	}
 	
-	
+	private int update(String sql, Object value) {
+		try {
+			
+			int update = this.config.getJdbcTemplate().update(sql, value);
+			if (LOGGER.isDebugEnabled()) {
+				SqlAndParams sqlAndParams = new SqlAndParams();
+				sqlAndParams.setSql(sql);
+				sqlAndParams.addArgs(value);
+				sqlAndParams.addResult(update);
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
+			return update;
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					SqlAndParams sqlAndParams = new SqlAndParams();
+					sqlAndParams.setSql(sql);
+					sqlAndParams.addArgs(value);
+					ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+				}
+				
+				throw new JdbcLinkRuntimeException(e);
+			}
+	}
 	
 	@Override
 	public int execute() {
@@ -104,7 +114,7 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 		try {
 			int update = this.config.getJdbcTemplate().update(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray());
 			if (LOGGER.isDebugEnabled()) {
-				sqlAndParams.setCountResult((long) update);
+				sqlAndParams.addResult(update);
 				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
 			}
 			return update;

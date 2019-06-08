@@ -648,6 +648,32 @@ public class Param<T> {
 		this.tag = "not exists";
 		return this.t;
 	}
+	public T isNull(EntityField field) {
+		this.field = field;
+		this.values = null;
+		this.tag = "is";
+		return this.t;
+	}
+	public T isNull(String tableAlias,EntityField field) {
+		this.tableAlias = tableAlias;
+		this.field = field;
+		this.values = null;
+		this.tag = "is";
+		return this.t;
+	}
+	public T isNotNull(EntityField field) {
+		this.field = field;
+		this.values = null;
+		this.tag = "is not";
+		return this.t;
+	}
+	public T isNotNull(String tableAlias,EntityField field) {
+		this.tableAlias = tableAlias;
+		this.field = field;
+		this.values = null;
+		this.tag = "is not";
+		return this.t;
+	}
 	
 	
 	public Param<T> when(Boolean isSatisfy) {

@@ -32,8 +32,6 @@ public class Join<T, C> implements QueryAble<C>,GroupByAble<Select<C>>,OrderAble
 	
 	protected String alias = "";
 	
-	protected String database = "";
-	
 	protected String prefix = "";
 	
 	protected EntityInfo entityInfo;
@@ -207,13 +205,4 @@ public class Join<T, C> implements QueryAble<C>,GroupByAble<Select<C>>,OrderAble
 	public void setConfig(JdbcLinkConfig config) {
 		this.config = config;
 	}
-	
-	public String getDatabase() {
-		return database;
-	}
-	
-	public void setDatabase(String database) {
-		this.database = database;
-	}
-	
 }

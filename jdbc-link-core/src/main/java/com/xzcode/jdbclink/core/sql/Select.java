@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -19,6 +21,7 @@ import com.xzcode.jdbclink.core.JdbcLink;
 import com.xzcode.jdbclink.core.JdbcLinkConfig;
 import com.xzcode.jdbclink.core.entity.EntityInfo;
 import com.xzcode.jdbclink.core.entity.model.EntityField;
+import com.xzcode.jdbclink.core.exception.JdbcLinkRuntimeException;
 import com.xzcode.jdbclink.core.format.DefaultKeyFormatter;
 import com.xzcode.jdbclink.core.format.DefaultValueFormatter;
 import com.xzcode.jdbclink.core.format.KeyFormatter;
@@ -60,16 +63,11 @@ LimitAble<Select<T>>,
 OrderAble<T>, 
 QueryAble<T>, 
 AliasAndPrefix {
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(Select.class);
 	protected JdbcLinkConfig config;
 
 	protected String mainAlias = ""; // 主表别名
 	
-	/**
-	 * 数据库名称
-	 */
-	protected String database;
-
 	private List<EachRowMapParam> eachRowMapParams;
 
 	private List<SingleColumnParam> singleColumnParams;
@@ -111,7 +109,6 @@ AliasAndPrefix {
 		this.config = config;
 		this.clazz = clazz;
 		this.mainAlias = this.entityInfo.getAlias();
-		this.database = this.entityInfo.getDatabase();
 	}
 	
 	public Select<T> column(String tableAlias, String column){
@@ -172,21 +169,6 @@ AliasAndPrefix {
 		return this;
 	}
 
-	/*
-	 * public Select<T> columnForSingleCol( String resultAlias, String
-	 * outerColumnName, String innerColumnName, Class<?> innerClazz ) {
-	 * 
-	 * this.addSingleColumnParam(new SingleColumnParam(resultAlias, outerColumnName,
-	 * innerColumnName, new SingleClolumnListMapExecution() {
-	 * 
-	 * @Override public List<Map<String, Object>> exec(Object[] colArr) { return
-	 * jdbcLink.select(innerClazz).where().and().in(innerColumnName,
-	 * colArr).queryListMap(); }
-	 * 
-	 * }));
-	 * 
-	 * return this; }
-	 */
 	public Select<T> count(String tableAlias, EntityField field, String alias) {
 		return this.column("count(" + tableAlias + "." + field.fieldName() + ") " + alias);
 	}
@@ -234,22 +216,6 @@ AliasAndPrefix {
 	public List<Map<String, Object>> byFieldForListMap(EntityField field, Object val) {
 		return this.where().and().eq(field, val).queryListMap();
 	}
-/*
-	@Override
-	public OrderParam<T> orderBy(EntityField orderBy) {
-		return orderBy(true, orderBy.getTableAlias(), orderBy);
-	}
-	
-	@Override
-	public OrderParam<T> orderBy(String tableAlias, EntityField orderBy) {
-		return orderBy(true, tableAlias, orderBy);
-	}
-
-	@Override
-	public OrderParam<T> orderBy(boolean isSactisfy, EntityField orderBy) {
-		return orderBy(isSactisfy, orderBy.getTableAlias(), orderBy);
-	}
-	*/
 	@Override
 	public OrderParam<T> orderBy(boolean isSactisfy, String tableAlias, EntityField orderBy) {
 		OrderParam<T> orderParam = new OrderParam<>(isSactisfy, tableAlias, orderBy, this);
@@ -270,18 +236,6 @@ AliasAndPrefix {
 		this.addOrder(new OrderParam<T>(isSactisfy, tableAlias, orderBy, sorting, this));
 		return this;
 	}
-/*	
-	@Override
-	public Select<T> orderBy(String orderBy, String sorting) {
-		return orderBy(true, null, orderBy, sorting);
-	}
-
-	@Override
-	public Select<T> orderBy(String tableAlias, String orderBy, String sorting) {
-		return orderBy(true, tableAlias, orderBy, sorting);
-	}
-	
-	*/
 
 	public Select<T> addOrder(OrderParam<T> orderParam) {
 		if (orderParam.isSactisfy()) {
@@ -304,15 +258,23 @@ AliasAndPrefix {
 			return null;
 		}
 	}
+	
 
 	@Override
 	public T queryEntity() {
+		SqlAndParams sqlAndParams = null;
 		try {
-			SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
-			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-			return this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(),
-					new EntityResultSetExtractor<>(clazz, entityInfo));
+			sqlAndParams = sqlResolver.handelSelect(this);
+			T result = this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new EntityResultSetExtractor<>(clazz, entityInfo));
+			if (LOGGER.isDebugEnabled()) {
+				sqlAndParams.addResult(result);
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
+			return result;
 		} catch (EmptyResultDataAccessException e) {
+			if (LOGGER.isDebugEnabled()) {
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
 			return null;
 		}
 	}
@@ -323,63 +285,92 @@ AliasAndPrefix {
 		if (this.limit == null) {
 			this.limit = DIFAULT_LIMIT_PARAM;
 		}
-		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
-		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		List<T> items = this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(),
-				new EntityRowMapper<T>(clazz, entityInfo));
-
-		Integer total = config.getJdbcTemplate().queryForObject(sqlAndParams.getCountSql(), Integer.class,
-				sqlAndParams.getCountParams());
 		Pager<T> pager = new Pager<>();
+		SqlAndParams sqlAndParams = null;
+		try {
+			
+			sqlAndParams = sqlResolver.handelSelect(this);
+			//ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			List<T> items = this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(),
+					new EntityRowMapper<T>(clazz, entityInfo));
+			
+			Integer total = config.getJdbcTemplate().queryForObject(sqlAndParams.getCountSql(), Integer.class,
+					sqlAndParams.getCountParams());
+			pager.setTotal(total);
+			pager.setItems(items);
+			pager.setPageNo(limit.getPageNo());
+			pager.setPageSize(limit.getPageSize());
+			
+			if (LOGGER.isDebugEnabled()) {
+				sqlAndParams.addResult(items);
+				sqlAndParams.addResult(total);
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
+			
+		} catch (Exception e) {
+			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			throw new JdbcLinkRuntimeException(e);
+		}
 
-		pager.setTotal(total);
-		pager.setItems(items);
-		pager.setPageNo(limit.getPageNo());
-		pager.setPageSize(limit.getPageSize());
 
 		return pager;
 	}
 
 	public List<T> queryList() {
-		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
-		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		List<T> list = this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(),
-				new EntityRowMapper<T>(clazz, entityInfo));
-		return list;
+		SqlAndParams sqlAndParams = null;
+		try {
+			sqlAndParams = sqlResolver.handelSelect(this);
+			List<T> list = this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new EntityRowMapper<T>(clazz, entityInfo));
+			if (LOGGER.isDebugEnabled()) {
+				sqlAndParams.addResult(list);
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
+			return list;
+		} catch (Exception e) {
+			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			throw new JdbcLinkRuntimeException(e);
+		}
 	}
 
 	public Map<String, Object> queryMap() {
+		SqlAndParams sqlAndParams = null;
+		try {
+			sqlAndParams = sqlResolver.handelSelect(this);
+			Map<String, Object> resultMap = config.getJdbcTemplate().query(sqlAndParams.getSql(),
+					sqlAndParams.getArgs().toArray(), new ResultSetExtractor<Map<String, Object>>() {
 
-		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
-		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		Map<String, Object> resultMap = config.getJdbcTemplate().query(sqlAndParams.getSql(),
-				sqlAndParams.getArgs().toArray(), new ResultSetExtractor<Map<String, Object>>() {
-
-					@Override
-					public Map<String, Object> extractData(ResultSet rs) throws SQLException, DataAccessException {
-						Map<String, Object> map = new LinkedHashMap<>();
-						ResultSetMetaData metaData = rs.getMetaData();
-						int columnCount = metaData.getColumnCount();
-						while (rs.next()) {
-							if (map == null) {
-								map = new LinkedHashMap<>();
+						@Override
+						public Map<String, Object> extractData(ResultSet rs) throws SQLException, DataAccessException {
+							Map<String, Object> map = new LinkedHashMap<>();
+							ResultSetMetaData metaData = rs.getMetaData();
+							int columnCount = metaData.getColumnCount();
+							while (rs.next()) {
+								if (map == null) {
+									map = new LinkedHashMap<>();
+								}
+								for (int i = 1; i <= columnCount; i++) {
+									map.put(getKeyFormatter().format(metaData.getColumnLabel(i)),
+											getValueFormatter().format(rs.getObject(i)));
+								}
 							}
-							for (int i = 1; i <= columnCount; i++) {
-								map.put(getKeyFormatter().format(metaData.getColumnLabel(i)),
-										getValueFormatter().format(rs.getObject(i)));
-							}
+							return map;
 						}
-						return map;
-					}
-				});
+					});
 
-		if (resultMap != null && (this.eachRowMapParams != null || this.singleColumnParams != null)) {
-			List<Map<String, Object>> resultListMap = new LinkedList<>();
-			resultListMap.add(resultMap);
-			handleColumnExecution(resultListMap);
+			if (resultMap != null && (this.eachRowMapParams != null || this.singleColumnParams != null)) {
+				List<Map<String, Object>> resultListMap = new LinkedList<>();
+				resultListMap.add(resultMap);
+				handleColumnExecution(resultListMap);
+			}
+			if (LOGGER.isDebugEnabled()) {
+				sqlAndParams.addResult(resultMap);
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
+			return resultMap;
+		} catch (Exception e) {
+			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			throw new JdbcLinkRuntimeException(e);
 		}
-
-		return resultMap;
 	}
 
 	@Override
@@ -389,39 +380,58 @@ AliasAndPrefix {
 
 	@Override
 	public <F> List<F> queryFirstColumn(Class<F> f) {
-		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
-		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		List<F> resultList = config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(),
-				new ResultSetExtractor<List<F>>() {
+		SqlAndParams sqlAndParams = null;
+		try {
+			sqlAndParams = sqlResolver.handelSelect(this);
+			List<F> resultList = config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(),
+					new ResultSetExtractor<List<F>>() {
 
-					@SuppressWarnings("unchecked")
-					@Override
-					public List<F> extractData(ResultSet rs) throws SQLException, DataAccessException {
-						List<F> list = new LinkedList<>();
+						@SuppressWarnings("unchecked")
+						@Override
+						public List<F> extractData(ResultSet rs) throws SQLException, DataAccessException {
+							List<F> list = new LinkedList<>();
 
-						while (rs.next()) {
-							if (f == String.class) {
-								list.add((F) String.valueOf(getValueFormatter().format(rs.getObject(1))));
-							} else {
-								list.add((F) getValueFormatter().format(rs.getObject(1)));
+							while (rs.next()) {
+								if (f == String.class) {
+									list.add((F) String.valueOf(getValueFormatter().format(rs.getObject(1))));
+								} else {
+									list.add((F) getValueFormatter().format(rs.getObject(1)));
+								}
 							}
+							return list;
 						}
-						return list;
-					}
-				});
-		return resultList;
+					});
+			
+			if (LOGGER.isDebugEnabled()) {
+				sqlAndParams.addResult(resultList);
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
+			return resultList;
+		} catch (DataAccessException e) {
+			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			throw new JdbcLinkRuntimeException(e);
+		}
 	}
 
 	@Override
 	public List<Map<String, Object>> queryListMap() {
-		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
-		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		List<Map<String, Object>> resultListMap = config.getJdbcTemplate().query(sqlAndParams.getSql(),
-				sqlAndParams.getArgs().toArray(), new ListMapRowMapper(getKeyFormatter(), getValueFormatter()));
+		SqlAndParams sqlAndParams = null;
+		
+		try {
+			sqlAndParams = sqlResolver.handelSelect(this);
+			List<Map<String, Object>> resultListMap = config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new ListMapRowMapper(getKeyFormatter(), getValueFormatter()));
 
-		handleColumnExecution(resultListMap);
+			handleColumnExecution(resultListMap);
 
-		return resultListMap;
+			if (LOGGER.isDebugEnabled()) {
+				sqlAndParams.addResult(resultListMap);
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
+			return resultListMap;
+		} catch (DataAccessException e) {
+			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			throw new JdbcLinkRuntimeException(e);
+		}
 	}
 
 	private void handleColumnExecution(List<Map<String, Object>> resultListMap) {
@@ -473,8 +483,7 @@ AliasAndPrefix {
 
 										Map<String, Object> outMap = outIdMap.get(outPropId);
 										@SuppressWarnings("unchecked")
-										List<Map<String, Object>> subList2 = (List<Map<String, Object>>) outMap
-												.get(param.getResultKeyAlias());
+										List<Map<String, Object>> subList2 = (List<Map<String, Object>>) outMap.get(param.getResultKeyAlias());
 										if (subList2 == null) {
 											subList2 = new LinkedList<>();
 											outMap.put(param.getResultKeyAlias(), subList2);
@@ -502,28 +511,39 @@ AliasAndPrefix {
 		if (this.limit == null) {
 			this.limit = DIFAULT_LIMIT_PARAM;
 		}
-		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
-		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-		List<Map<String, Object>> items = config.getJdbcTemplate().query(sqlAndParams.getSql(),
-				sqlAndParams.getArgs().toArray(), new ListMapRowMapper(getKeyFormatter(), getValueFormatter()));
+		SqlAndParams sqlAndParams = null;
+		try {
+			sqlAndParams = sqlResolver.handelSelect(this);
+			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			List<Map<String, Object>> items = config.getJdbcTemplate().query(sqlAndParams.getSql(),
+					sqlAndParams.getArgs().toArray(), new ListMapRowMapper(getKeyFormatter(), getValueFormatter()));
 
-		handleColumnExecution(items);
+			handleColumnExecution(items);
 
-		Integer total = config.getJdbcTemplate().queryForObject(sqlAndParams.getCountSql(),
-				sqlAndParams.getCountParams().toArray(), new RowMapper<Integer>() {
-					@Override
-					public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
-						return rs.getInt(1);
-					}
-				});
-		Pager<Map<String, Object>> pager = new Pager<Map<String, Object>>();
+			Integer total = config.getJdbcTemplate().queryForObject(sqlAndParams.getCountSql(),
+					sqlAndParams.getCountParams().toArray(), new RowMapper<Integer>() {
+						@Override
+						public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+							return rs.getInt(1);
+						}
+					});
+			Pager<Map<String, Object>> pager = new Pager<Map<String, Object>>();
 
-		pager.setTotal(total);
-		pager.setItems(items);
-		pager.setPageNo(limit.getPageNo());
-		pager.setPageSize(limit.getPageSize());
+			pager.setTotal(total);
+			pager.setItems(items);
+			pager.setPageNo(limit.getPageNo());
+			pager.setPageSize(limit.getPageSize());
 
-		return pager;
+			if (LOGGER.isDebugEnabled()) {
+				sqlAndParams.addResult(pager);
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
+			return pager;
+		} catch (DataAccessException e) {
+			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			throw new JdbcLinkRuntimeException(e);
+		}
+		
 	}
 
 	public void addSelectParams(SelectParam selectParam) {
@@ -726,12 +746,5 @@ AliasAndPrefix {
 		this.config = config;
 	}
 	
-	public String getDatabase() {
-		return database;
-	}
-	
-	public void setDatabase(String database) {
-		this.database = database;
-	}
 
 }

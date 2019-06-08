@@ -8,7 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 
 import com.xzcode.jdbclink.core.JdbcLinkConfig;
@@ -16,12 +17,15 @@ import com.xzcode.jdbclink.core.entity.EntityFieldInfo;
 import com.xzcode.jdbclink.core.entity.EntityInfo;
 import com.xzcode.jdbclink.core.entity.IEntity;
 import com.xzcode.jdbclink.core.entity.model.EntityField;
+import com.xzcode.jdbclink.core.exception.JdbcLinkRuntimeException;
 import com.xzcode.jdbclink.core.models.SqlAndParams;
 import com.xzcode.jdbclink.core.resolver.ISqlResolver;
 import com.xzcode.jdbclink.core.sql.interfaces.ExecuteAble;
 import com.xzcode.jdbclink.core.util.ShowSqlUtil;
 
 public class Update implements ExecuteAble{
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(Update.class);
 	
 	protected JdbcLinkConfig config;
 	
@@ -30,14 +34,6 @@ public class Update implements ExecuteAble{
 	protected UpdateSet set;
 	
 	protected ISqlResolver sqlResolver;
-	
-	protected String database;
-	
-	/*protected LimitParam limit;*/
-	
-	//private static final Class<?>[] NULL_CLASS_ARRAY = new Class<?>[]{};
-	
-	//private static final Object[] NULL_OBJECT_ARRAY = new Object[]{};
 	
 	public Update() {
 	}
@@ -59,8 +55,6 @@ public class Update implements ExecuteAble{
 	}
 	
 	public int updateNullable(IEntity entity, EntityField...nullableFields){
-		int result = 0;
-		
 		try {
 			EntityInfo entityInfo = config.getEntityInfoCache().getEntityInfo(entity.getClass());
 			StringBuilder sql = config.getStringBuilderPool().get();
@@ -140,13 +134,35 @@ public class Update implements ExecuteAble{
 				
 			};*/
 			
-			result = this.config.getJdbcTemplate().update(statement);
-			
+			int result = this.config.getJdbcTemplate().update(statement);
+			return update(sqlStr, args, result);
 			
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new JdbcLinkRuntimeException(e);
 		}
-		return result;
+	}
+	
+	private int update(String sql, List<Object> args, int result) {
+		try {
+			
+			if (LOGGER.isDebugEnabled()) {
+				SqlAndParams sqlAndParams = new SqlAndParams();
+				sqlAndParams.setSql(sql);
+				sqlAndParams.setArgs(args);
+				sqlAndParams.addResult(result);
+				ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+			}
+			return result;
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					SqlAndParams sqlAndParams = new SqlAndParams();
+					sqlAndParams.setSql(sql);
+					sqlAndParams.setArgs(args);
+					ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+				}
+				
+				throw new JdbcLinkRuntimeException(e);
+			}
 	}
 	
 	@Override
@@ -183,15 +199,4 @@ public class Update implements ExecuteAble{
 		return this;
 	}
 	
-	public String getDatabase() {
-		return database;
-	}
-	
-	public void setDatabase(String database) {
-		this.database = database;
-	}
-	
-	/*public void setLimit(LimitParam limitParam) {
-		this.limit = limitParam;
-	}*/
 }

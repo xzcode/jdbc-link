@@ -145,5 +145,28 @@ public class SelectTest {
 		}
 		
 	}
+	
+	
+	@Test
+	public void test08() throws SQLException {
+		
+		Pager<Map<String, Object>> pager = jdbcLink.select(Product.class, "p")
+		.column("p", Product.ALL_)
+		.column(Category.ALL_)
+		//.column(Category.CATEGORY_NAME)
+		//.columnSql("concat(",Product.NAME, ",", Category.CATEGORY_NAME, ") ccc")
+		
+		.join(Category.class)
+			.on().eq(Category.UID, "p", Product.CATEGORY_ID)
+		.where()
+			.and().isNotNull("p", Product.UID)
+		.orderBy("p", Product.UID).asc()
+		.orderBy("p", Product.CREATE_DATE).desc()
+		.limit(1, 10)
+		.pageListMap();
+
+		System.out.println(gson.toJson(pager));
+		
+	}
 
 }
