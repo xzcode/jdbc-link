@@ -2,11 +2,13 @@ package com.xzcode.jdbclink.core.sql.groupby;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.xzcode.jdbclink.core.entity.model.EntityField;
+
 public class GroupByParam {
 	
 	private String alias = "";
 	
-	private String column;
+	private EntityField column;
 	
 	
 	
@@ -14,12 +16,12 @@ public class GroupByParam {
 		super();
 	}
 
-	public GroupByParam(String column) {
+	public GroupByParam(EntityField column) {
 		super();
 		this.column = column;
 	}
 
-	public GroupByParam(String alias, String column) {
+	public GroupByParam(String alias, EntityField column) {
 		super();
 		this.alias = alias;
 		this.column = column;
@@ -36,11 +38,11 @@ public class GroupByParam {
 		this.alias = alias;
 	}
 
-	public String getColumn() {
+	public EntityField getColumn() {
 		return column;
 	}
 
-	public void setColumn(String column) {
+	public void setColumn(EntityField column) {
 		this.column = column;
 	}
 	

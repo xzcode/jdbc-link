@@ -325,10 +325,9 @@ public class JdbcLinkGenerator {
 			
 			//获取表实体信息
 			List<TableEntityInfo> tableEntityInfos =  new ArrayList<>();
-			List<TableEntityInfo> infos = new ArrayList<>();
 			String[] databases = entityGeneratorConfig.getEntityDatabaseName();
 			for (String db : databases) {
-				infos.addAll(databaseInfoAdapter.getTableInfos(db));
+				tableEntityInfos.addAll(databaseInfoAdapter.getTableInfos(db));
 			}
 			
 			Configuration extraTemplateConfig = getExtraTemplateConfig(generatorConfig.getTemplateLoaderClass(), generatorConfig.getTemplatePath());

@@ -515,8 +515,7 @@ AliasAndPrefix {
 		try {
 			sqlAndParams = sqlResolver.handelSelect(this);
 			ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-			List<Map<String, Object>> items = config.getJdbcTemplate().query(sqlAndParams.getSql(),
-					sqlAndParams.getArgs().toArray(), new ListMapRowMapper(getKeyFormatter(), getValueFormatter()));
+			List<Map<String, Object>> items = config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new ListMapRowMapper(getKeyFormatter(), getValueFormatter()));
 
 			handleColumnExecution(items);
 

@@ -54,13 +54,11 @@ public class SqlResolver implements ISqlResolver {
 
 		EntityInfo entityInfo = select.getEntityInfo();
 		
-		List<Object> args = new LinkedList<>();
 		
-		//List<String> selectColumns = null;
 		
 		List<SelectParam> selectParams = select.getSelectParams();
 		
-		//Map<String, AliasAndPrefix> joinsMap = select.getJoins();
+		List<Object> args = new ArrayList<>();
 		
 		if (selectParams == null) {
 			select.column(select.getMainAlias(), "*");
@@ -182,22 +180,6 @@ public class SqlResolver implements ISqlResolver {
 			}
 		}
 		
-		SqlAndParams sqlAndParams = new SqlAndParams();
-		//创建count
-		if (select.isCreateCountSql()) {
-			makeCountSql(sqlAndParams, args, sql, stringBuilderPool);
-		}
-		
-		//插入查询列
-		sql.insert(0, columnsSql);
-		
-		//插入select 关键词
-		sql.insert(0, " select ");
-		
-		//回收对象
-		stringBuilderPool.returnOject(columnsSql);
-		
-		
 		List<GroupByParam> groupByParams = select.getGroupByParams();
 		
 		if (groupByParams != null) {
@@ -207,7 +189,7 @@ public class SqlResolver implements ISqlResolver {
 				if (StringUtils.isNotEmpty(groupByParam.getAlias())) {
 					sql.append(groupByParam.getAlias()).append(".");
 				}
-				sql.append("`").append(groupByParam.getColumn()).append("`").append(",");
+				sql.append("`").append(groupByParam.getColumn().fieldName()).append("`").append(",");
 			}
 			sql.setLength(sql.length()-1);
 			
@@ -233,6 +215,24 @@ public class SqlResolver implements ISqlResolver {
 				stringBuilderPool.returnOject(havingColumnsSql);
 			}
 		}
+		
+		SqlAndParams sqlAndParams = new SqlAndParams();
+		//创建count
+		if (select.isCreateCountSql()) {
+			makeCountSql(sqlAndParams, args, sql);
+		}
+		
+		//插入查询列
+		sql.insert(0, columnsSql);
+		
+		//插入select 关键词
+		sql.insert(0, " select ");
+		
+		//回收对象
+		stringBuilderPool.returnOject(columnsSql);
+		
+		
+		
 		
 		
 		
@@ -435,18 +435,22 @@ public class SqlResolver implements ISqlResolver {
 			return sqlAndParams;
 		}
 
-	private static void makeCountSql(
+	private void makeCountSql(
 			SqlAndParams sqlAndParams, 
 			List<Object> args, 
-			StringBuilder sqlPart,
-			StringBuilderPool stringBuilderPool
+			StringBuilder sqlPart
 			){
 		List<Object> countParams = new ArrayList<>();
 		countParams.addAll(args);
 		sqlAndParams.setCountParams(countParams);
-		StringBuilder countSql = stringBuilderPool.get();
-		countSql.append("select count(*) ").append(sqlPart);;
-		sqlAndParams.setCountSql(countSql.toString());
+		StringBuilderPool stringBuilderPool = config.getStringBuilderPool();
+		StringBuilder countSql = config.getStringBuilderPool().get();
+		countSql.append("select count(*) ").append(sqlPart);
+		String countSqlStr = countSql.toString();
+		if (countSqlStr.contains("group by")) {
+			countSqlStr = "select count(*) from ("+countSqlStr+") t";
+		}
+		sqlAndParams.setCountSql(countSqlStr);
 		stringBuilderPool.returnOject(countSql);
 	}
 	
