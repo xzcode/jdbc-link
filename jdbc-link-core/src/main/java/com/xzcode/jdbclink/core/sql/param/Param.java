@@ -649,6 +649,7 @@ public class Param<T> {
 		return this.t;
 	}
 	public T isNull(EntityField field) {
+		this.tableAlias = field.tableAlias();
 		this.field = field;
 		this.values = null;
 		this.tag = "is";
@@ -662,6 +663,7 @@ public class Param<T> {
 		return this.t;
 	}
 	public T isNotNull(EntityField field) {
+		this.tableAlias = field.tableAlias();
 		this.field = field;
 		this.values = null;
 		this.tag = "is not";
