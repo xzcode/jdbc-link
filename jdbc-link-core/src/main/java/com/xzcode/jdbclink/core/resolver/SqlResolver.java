@@ -567,7 +567,7 @@ public class SqlResolver implements ISqlResolver {
 			}
 			
 			if (param.getType() == Param.TypeConstant.SQL_PART) {
-				sql.append(param.getSqlpart()).append(" ");
+				sql.append(param.getConnect()).append(" ").append(param.getSqlpart()).append(" ");
 				return true;
 			}
 			
