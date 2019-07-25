@@ -17,7 +17,6 @@
             <id>dev</id>
             <properties>
 				<nexus.public>http://common.host:8081/repository/maven-public/</nexus.public>
-                <nexus.host>http://common.host:8081/repository/maven-snapshots/</nexus.host>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -28,7 +27,6 @@
             <id>release</id>
             <properties>
 				<nexus.public>http://release.host:8081/repository/maven-public/</nexus.public>
-                <nexus.host>http://release.host:8081/repository/maven-releases/</nexus.host>
             </properties>
         </profile>
     </profiles>
