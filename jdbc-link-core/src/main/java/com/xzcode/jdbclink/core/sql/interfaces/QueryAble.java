@@ -15,16 +15,12 @@ public interface QueryAble<T> extends GetSelectAble<T>{
 	}
 	
 	
-	/**
-	 * 获取单行单列的一个数据
-	 * @param clazz
-	 * @return
-	 * 
-	 * @author zai
-	 * 2017-06-14
-	 */
 	public default <E> E queryObject(Class<E> clazz) {
 		return this.getSelect().queryObject(clazz);
+	}
+	
+	public default <E> E queryObject(Class<E> clazz, E defaultValue) {
+		return this.getSelect().queryObject(clazz, defaultValue);
 	}
 	
 	/**

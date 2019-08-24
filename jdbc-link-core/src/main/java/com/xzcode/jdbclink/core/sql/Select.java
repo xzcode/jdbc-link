@@ -247,13 +247,25 @@ AliasAndPrefix {
 		return this;
 	}
 
+	public <E> E queryObject(Class<E> ObjectClazz, E defaultValue) {
+		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
+		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
+		try {
+			E result = this.config.getJdbcTemplate().queryForObject(sqlAndParams.getSql(), ObjectClazz, sqlAndParams.getArgs().toArray());
+			if (result == null) {
+				return defaultValue;
+			}
+			return result;
+		} catch (EmptyResultDataAccessException e) {
+			return defaultValue;
+		}
+	}
+	
 	public <E> E queryObject(Class<E> ObjectClazz) {
 		SqlAndParams sqlAndParams = sqlResolver.handelSelect(this);
 		ShowSqlUtil.debugSqlAndParams(sqlAndParams);
 		try {
-
-			return this.config.getJdbcTemplate().queryForObject(sqlAndParams.getSql(), ObjectClazz,
-					sqlAndParams.getArgs().toArray());
+			return this.config.getJdbcTemplate().queryForObject(sqlAndParams.getSql(), ObjectClazz, sqlAndParams.getArgs().toArray());
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
