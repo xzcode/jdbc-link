@@ -140,7 +140,7 @@ public class MysqlDatabaseInfoAdapter implements IDatabaseInfoAdapter{
 			tableEntityInfo.setTableName((String) map.get("Name"));
 			tableEntityInfo.setTableComment((String) map.get("Comment"));
 			tableEntityInfo.setColumns(getColumnsInfo(databaseName, tableEntityInfo.getTableName()));
-			tableEntityInfo.setDatabaseName(databaseName);
+			/*tableEntityInfo.setDatabaseName(databaseName);*/
 			tableEntityInfo.setEntityClassName(classNameGenerator.generateClassName(tableEntityInfo.getTableName()));
 			if (entityGeneratorConfig.isCreateModulePackage()) {
 				String moduleName = moduleNameGenerator.generateModulePackageName(tableEntityInfo.getTableName(), null, null);

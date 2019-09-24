@@ -122,8 +122,12 @@ public class SqlResolver implements ISqlResolver {
 		
 		
 		sql.append(" from ");
-		sql.append("`").append(select.getEntityInfo().getDatabase()).append("`.");
-		sql.append(entityInfo.getTable())
+		/*
+		if (StringUtils.isNotEmpty(select.getEntityInfo().getDatabase())) {
+			sql.append("`").append(select.getEntityInfo().getDatabase()).append("`.");
+		}
+		*/
+		sql.append("`").append(entityInfo.getTable()).append("`")
 		.append(" ");
 		if (StringUtils.isNoneEmpty(select.getMainAlias())) {
 			sql.append(select.getMainAlias());
@@ -141,8 +145,12 @@ public class SqlResolver implements ISqlResolver {
 				sql
 				.append(sJoin.getJoinTag())
 				.append(" ");
-				sql.append("`").append(sJoin.getEntityInfo().getDatabase()).append("`").append(".");
-				sql.append(sJoin.getEntityInfo().getTable())
+				/*
+				if (StringUtils.isNotEmpty(select.getEntityInfo().getDatabase())) {
+					sql.append("`").append(sJoin.getEntityInfo().getDatabase()).append("`.");
+				}
+				*/
+				sql.append("`").append(sJoin.getEntityInfo().getTable()).append("`")
 				.append(" ")
 				.append(alias)
 				.append(" ")
@@ -298,7 +306,11 @@ public class SqlResolver implements ISqlResolver {
 			List<UpdateParam> updateParams = update.getSet().getParams();
 			
 			sql.append(" update ");
-			sql.append("`").append(entityInfo.getDatabase()).append("`").append(".");
+			/*
+			if (StringUtils.isNotEmpty(entityInfo.getDatabase())) {
+				sql.append("`").append(entityInfo.getDatabase()).append("`.");
+			}
+			*/
 			sql.append("`").append(entityInfo.getTable()).append("`")
 			.append(" set ")
 			;
@@ -392,7 +404,11 @@ public class SqlResolver implements ISqlResolver {
 			List<Object> args = new LinkedList<>();
 			
 			sql.append(" delete from ");
-			sql.append("`").append(entityInfo.getDatabase()).append("`").append(".");
+			/*
+			if (StringUtils.isNotEmpty(entityInfo.getDatabase())) {
+				sql.append("`").append(entityInfo.getDatabase()).append("`.");
+			}
+			*/
 			sql.append("`").append(entityInfo.getTable()).append("`")
 			;
 			

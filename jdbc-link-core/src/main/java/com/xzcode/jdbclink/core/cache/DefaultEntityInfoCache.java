@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.xzcode.jdbclink.core.annotations.Column;
 import com.xzcode.jdbclink.core.annotations.Id;
@@ -60,7 +59,7 @@ public class DefaultEntityInfoCache implements IEntityInfoCache{
 		
 		entityInfo.setAlias(table.name());
 		
-		entityInfo.setDatabase(table.database());
+		/*entityInfo.setDatabase(table.database());*/
 		
 		List<EntityFieldInfo> fieldInfos = entityInfo.getFieldInfos();
 		EntityFieldInfo fieldInfo = null;

@@ -48,7 +48,7 @@ public class Delete implements WhereAble<Delete, Delete>, ExecuteAble{
 		StringBuilder sb = config.getStringBuilderPool().get();
 		sb
 		.append(" delete from ");
-		sb.append("`").append(entityInfo.getDatabase()).append("`").append(".");
+		/*sb.append("`").append(entityInfo.getDatabase()).append("`").append(".");*/
 		sb.append("`").append(entityInfo.getTable()).append("`");
 		sb
 		.append(" where ")

@@ -10,8 +10,9 @@ import java.util.Set;
  * 2018-04-14
  */
 public class TableEntityInfo {
+	
 	/** 数据库名称. */
-	private String databaseName;
+	/*private String databaseName;*/
 	
 	/** 表名. */
 	private String tableName;
@@ -78,14 +79,14 @@ public class TableEntityInfo {
 		this.entityClassName = entityClassName;
 	}
 	
-	
+	/*
 	public String getDatabaseName() {
 		return databaseName;
 	}
 	
 	public void setDatabaseName(String databaseName) {
 		this.databaseName = databaseName;
-	}
+	}*/
 	
 	public String getFullPackageName() {
 		return fullPackageName;

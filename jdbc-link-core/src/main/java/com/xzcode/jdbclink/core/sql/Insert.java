@@ -56,7 +56,7 @@ public class Insert{
 			StringBuilder valuesSql = config.getStringBuilderPool().get();
 			
 			sql.append(" insert into ");
-			sql.append("`").append(entityInfo.getDatabase()).append("`").append(".");
+			/*sql.append("`").append(entityInfo.getDatabase()).append("`").append(".");*/
 			sql.append("`").append(entityInfo.getTable()).append("`");
 			sql.append(" ( ");
 			List<EntityFieldInfo> fieldInfos = entityInfo.getFieldInfos();

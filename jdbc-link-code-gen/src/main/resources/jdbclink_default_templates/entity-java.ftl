@@ -18,16 +18,11 @@ import ${imp};
  * ${.now?string("yyyy-MM-dd HH:mm:ss")}
  */
 @Entity
-@Table(database = ${tableEntityInfo.entityClassName}.__DATABASE_NAME__, name = ${tableEntityInfo.entityClassName}.__TABLE_NAME__, alias = ${tableEntityInfo.entityClassName}.__TABLE_NAME__)
+@Table(name = ${tableEntityInfo.entityClassName}.__TABLE_NAME__, alias = ${tableEntityInfo.entityClassName}.__TABLE_NAME__)
 public class ${tableEntityInfo.entityClassName} implements IEntity {
 	
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * 所在数据库名称
-	 */
-	public static final String __DATABASE_NAME__ = "${tableEntityInfo.databaseName}";
-	
 	/**
 	 * ${tableEntityInfo.tableComment} 表名
 	 */
