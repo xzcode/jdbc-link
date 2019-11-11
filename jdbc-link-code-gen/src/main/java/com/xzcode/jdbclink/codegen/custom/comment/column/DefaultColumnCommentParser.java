@@ -33,21 +33,28 @@ public class DefaultColumnCommentParser implements IColumnCommentParser {
 			if (arr.length > 0) {
 				List<ColumnCommentEnumProperty> props = new LinkedList<>();
 				for (String str : arr) {
-					String[] split = str.trim().replaceAll(" {2,}", " ").split(" ");
-					String name = split[2].trim();
-					String desc = split[1].trim().toUpperCase();
-					String value = split[0].trim();
-					ColumnCommentEnumProperty enumProperty = new ColumnCommentEnumProperty(name, desc, value);
-					
-					if (
-							(value.startsWith("\"") && value.endsWith("\""))
-							||
-							(value.startsWith("'") && value.endsWith("'"))
-						) {
-						enumProperty.setDataType(DataTypeEnumValues.STRING);
+					try {
+						
+						String[] split = str.trim().replaceAll(" {2,}", " ").split(" ");
+						String name = split[2].trim();
+						String desc = split[1].trim().toUpperCase();
+						String value = split[0].trim();
+						ColumnCommentEnumProperty enumProperty = new ColumnCommentEnumProperty(name, desc, value);
+						
+						if (
+								(value.startsWith("\"") && value.endsWith("\""))
+								||
+								(value.startsWith("'") && value.endsWith("'"))
+								) {
+							enumProperty.setDataType(DataTypeEnumValues.STRING);
+						}
+						
+						props.add(enumProperty);
+						
+					} catch (Exception e) {
+						System.out.println("comment error! info:" + columnComment);
+						e.printStackTrace();
 					}
-					
-					props.add(enumProperty);
 				}
 				colComment.setEnumProperties(props);
 			}

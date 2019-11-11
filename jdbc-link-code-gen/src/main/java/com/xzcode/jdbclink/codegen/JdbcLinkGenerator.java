@@ -344,6 +344,8 @@ public class JdbcLinkGenerator {
 							tableEntityInfo
 							);
 					
+					Map<String, Object> dataModel = templateInfo.getDataGenerator().generate(tableEntityInfo);
+					
 					String basicOutputPath = templateInfo.getBasicOutputPath() + "/" + modulePackageName + "/" + dirPart ;
 					File outDir = new File(basicOutputPath);
 					if (!outDir.exists()) {outDir.mkdirs();}
@@ -354,7 +356,6 @@ public class JdbcLinkGenerator {
 							);
 					
 					
-					Map<String, Object> dataModel = templateInfo.getDataGenerator().generate(tableEntityInfo);
 					
 					String outFilePath = basicOutputPath + "/" + fileName;
 					
