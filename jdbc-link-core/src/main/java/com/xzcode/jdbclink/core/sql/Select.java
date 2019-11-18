@@ -303,11 +303,15 @@ AliasAndPrefix {
 			
 			sqlAndParams = sqlResolver.handelSelect(this);
 			//ShowSqlUtil.debugSqlAndParams(sqlAndParams);
-			List<T> items = this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(),
-					new EntityRowMapper<T>(clazz, entityInfo));
+			List<T> items = this.config.getJdbcTemplate().query(sqlAndParams.getSql(), sqlAndParams.getArgs().toArray(), new EntityRowMapper<T>(clazz, entityInfo));
 			
-			Integer total = config.getJdbcTemplate().queryForObject(sqlAndParams.getCountSql(), Integer.class,
-					sqlAndParams.getCountParams());
+			Integer total = config.getJdbcTemplate().queryForObject(sqlAndParams.getCountSql(),
+					sqlAndParams.getCountParams().toArray(), new RowMapper<Integer>() {
+						@Override
+						public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+							return rs.getInt(1);
+						}
+					});
 			pager.setTotal(total);
 			pager.setItems(items);
 			pager.setPageNo(limit.getPageNo());
